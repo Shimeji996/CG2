@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33530.505
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CG2", "CG2.vcxproj", "{61D9693B-DE0C-4112-95F5-5981724CE3AF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューション項目", "ソリューション項目", "{367C5B92-2551-43F0-A532-238779AF0707}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig.txt = .editorconfig.txt
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{61D9693B-DE0C-4112-95F5-5981724CE3AF}.Debug|x64.ActiveCfg = Debug|x64
+		{61D9693B-DE0C-4112-95F5-5981724CE3AF}.Debug|x64.Build.0 = Debug|x64
+		{61D9693B-DE0C-4112-95F5-5981724CE3AF}.Release|x64.ActiveCfg = Release|x64
+		{61D9693B-DE0C-4112-95F5-5981724CE3AF}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {86B1C1FC-3EB4-4DE5-A8F4-65F46A621335}
+	EndGlobalSection
+EndGlobal

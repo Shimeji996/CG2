@@ -11,11 +11,11 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
-	WinApp::WinApp(const wchar_t* name) {
+	void WinApp::Initialize() {
 
 		wc.lpfnWndProc = WindowProc;
 
-		wc.lpszClassName = name;
+		wc.lpszClassName = L"CG2WindowClass";
 
 		wc.hInstance = GetModuleHandle(nullptr);
 
@@ -30,7 +30,7 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 		//ウィンドウを生成
 		HWND hwnd = CreateWindow(
 			wc.lpszClassName,
-			name,
+			L"CG2",
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,

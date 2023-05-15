@@ -4,7 +4,8 @@
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
-	WinApp* winApp = new WinApp(L"CG2");
+	WinApp* winApp = new WinApp;
+	winApp->Initialize();
 
 #pragma region ゲームループ
 

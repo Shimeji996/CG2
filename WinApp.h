@@ -6,8 +6,7 @@ class WinApp
 {
 public:
 
-	WinApp(const wchar_t* name);
-	~WinApp();
+	void Initialize();
 
 	static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 

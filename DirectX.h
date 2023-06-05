@@ -1,85 +1,87 @@
-#pragma once
-#include <Windows.h>
-#include <string>
-#include <format>
-#include <d3d12.h>
+ï»¿#pragma once
+#include <chrono>
+#include <cstdlib>
 #include <dxgi1_6.h>
-#include <cassert>
-#include <dxgidebug.h>
-
 #include "WinApp.h"
-
-#pragma comment(lib,"d3d12.lib")
-#pragma comment(lib,"dxgi.lib")
-#pragma comment(lib,"dxguid.lib")
+#include "String.h"
 
 class DirectXCommon
 {
 public:
-	static const int32_t kClientWidth = 1280;
-	static const int32_t kClientHeight = 720;
+	void Initialization(WinApp* win, const wchar_t* title, int32_t backBufferWidth = WinApp::kClientWidth, int32_t backBufferHeight = WinApp::kClientHeight);
 
-	static void Log(const std::string& message);
+	void PreDraw();
 
-	static void DirectXInitialization();
+	void PostDraw();
 
-	static void InitializeDXGIDevice();
+	static inline void ClearRenderTarget();
 
-	static void InitializeCommand();
+	static void Finalize();
 
-	static void CreateSwapChain();
+	HRESULT GetHr() { return  hr_; }
 
-	static void CreateFinalRenderTargets();
+	void SetHr(HRESULT a) { this->hr_ = a; }
 
-	static void CreateFence();
+	ID3D12Device* GetDevice() { return device_; }
 
-	static void Release();
-
-	static void ResourceCheck();
+	ID3D12GraphicsCommandList* GetCommandList() { return commandList_; }
 
 private:
 	static WinApp* winApp_;
 
-	//@DXGIƒtƒ@ƒNƒgƒŠ[¶¬
-	static IDXGIFactory7* dxgiFactory;
-	static HRESULT hr;
+	//DXGIãƒ•ã‚¡ã‚¯ãƒˆãƒªãƒ¼ã®ç”Ÿæˆ
+	static IDXGIFactory7* dxgiFactory_;
 
-	// g—p‚·‚éƒAƒ_ƒvƒ^—p‚Ì•Ï”
-	static IDXGIAdapter4* useAdapter;
+	//ä½¿ç”¨ã™ã‚‹ã‚¢ãƒ€ãƒ—ã‚¿ç”¨ã®å¤‰æ•°
+	static IDXGIAdapter4* useAdapter_;
 
-	// D3D12Device¶¬
-	static ID3D12Device* device;
+	//D3D12Deviceã®ç”Ÿæˆ
+	static	ID3D12Device* device_;
 
-	// ƒRƒ}ƒ“ƒhƒLƒ…[‚ğ¶¬‚·‚é
-	static ID3D12CommandQueue* commandQueue;
-	static inline D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
+	//ã‚³ãƒãƒ³ãƒ‰ã‚­ãƒ¥ãƒ¼ç”Ÿæˆ
+	static ID3D12CommandQueue* commandQueue_;
 
-	// ƒRƒ}ƒ“ƒhƒAƒƒP[ƒ^‚ğ¶¬‚·‚é
-	static ID3D12CommandAllocator* commandAllocator;
+	//ã‚³ãƒãƒ³ãƒ‰ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ã®ç”Ÿæˆ
+	static ID3D12CommandAllocator* commandAllocator_;
 
-	// ƒRƒ}ƒ“ƒhƒŠƒXƒg‚Ì¶¬
-	static ID3D12GraphicsCommandList* commandList;
+	//ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã‚’ç”Ÿæˆã™ã‚‹
+	static ID3D12GraphicsCommandList* commandList_;
 
-	// ƒXƒƒbƒvƒ`ƒF[ƒ“‚ğ¶¬‚·‚é
-	static IDXGISwapChain4* swapChain;
-	static inline DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+	//ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ãƒ¼ãƒ³
+	static IDXGISwapChain4* swapChain_;
 
-	// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ì¶¬
-	static ID3D12DescriptorHeap* rtvDescriptorHeap;
-	static inline D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
+	//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®ç”Ÿæˆ
+	static ID3D12DescriptorHeap* rtvDescriptorHeap_;
 
-	// Swapchain‚©‚çResource‚ğˆø‚Á’£‚Á‚Ä‚­‚é
-	static ID3D12Resource* swapChainResources[2];
+	//RTVã‚’ï¼’ã¤ä½œã‚‹ã®ã§ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã‚’ï¼’ã¤ç”¨æ„
+	static	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
+	static	ID3D12Resource* swapChainResources_[2];
 
-	// ‰Šú’l0‚ÅFence‚ğì‚é
-	static ID3D12Fence* fence;
-	static uint64_t fenceValue;
+	//Fence
+	static ID3D12Fence* fence_;
+	static UINT64 fenceValue_;
+	static HANDLE fenceEvent_;
 
-	// Fence‚ÌSignal‚ğ‚Â‚½‚ß‚ÉƒCƒxƒ“ƒg‚ğì¬‚·‚é
-	static HANDLE fenceEvent;
+	//buffer
+	static	int32_t backBufferWidth_;
+	static	int32_t backBufferHeight_;
 
-	// ƒfƒoƒbƒO
-	static ID3D12Debug1* debugController;
-	static IDXGIDebug1* debug;
+	//barrier
+	static	inline D3D12_RESOURCE_BARRIER barrier_{};
+
+	//hr
+	static HRESULT hr_;
+
+
+private:
+	void InitializeDXGIDevice();
+
+	void CreateSwapChain();
+
+	void InitializeCommand();
+
+	void CreateFinalRenderTargets();
+
+	void CreateFence();
 };
 

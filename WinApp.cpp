@@ -1,55 +1,91 @@
-#include "WinApp.h"
+ï»¿#include "WinApp.h"
 
-//ƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒ
+//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-	//ƒƒbƒZ[ƒW‚É‰ž‚¶‚ÄƒQ[ƒ€ŒÅ—L‚Ìˆ—‚ðs‚¤
+	//ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã«å¿œã˜ã¦ã‚²ãƒ¼ãƒ å›ºæœ‰ã®å‡¦ç†ã‚’è¡Œã†
 	switch (msg) {
-		//ƒEƒBƒ“ƒhƒE‚ª”jŠü‚³‚ê‚½
+		//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒç ´æ£„ã•ã‚ŒãŸ
 	case WM_DESTROY:
-		// OS‚É‘Î‚µ‚ÄAƒAƒvƒŠ‚ÌI—¹‚ð“`‚¦‚é
+		// OSã«å¯¾ã—ã¦ã€ã‚¢ãƒ—ãƒªã®çµ‚äº†ã‚’ä¼ãˆã‚‹
 		PostQuitMessage(0);
 		return 0;
 	}
 
-	// •W€‚ÌƒƒbƒZ[ƒWˆ—‚ðs‚¤
+	// æ¨™æº–ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡¦ç†ã‚’è¡Œã†
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-void WinApp::CreateWindowView(const wchar_t* title) {
-	//ƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒ
-	wc.lpfnWndProc = WindowProc;
-	//ƒNƒ‰ƒX–¼
-	wc.lpszClassName = L"CG2WindowClass";
-	//ƒCƒ“ƒXƒ^ƒ“ƒXƒnƒ“ƒhƒ‹H
-	wc.hInstance = GetModuleHandle(nullptr);
-	//ƒJ[ƒ\ƒ‹
-	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+void WinApp::CreateWindowView(const wchar_t* title, int32_t clientWidth, int32_t clientheight) {
+	//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
+	wc_.lpfnWndProc = WindowProc;
+	//ã‚¯ãƒ©ã‚¹å
+	wc_.lpszClassName = L"CG2WindowClass";
+	//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãƒãƒ³ãƒ‰ãƒ«
+	wc_.hInstance = GetModuleHandle(nullptr);
+	//ã‚«ãƒ¼ã‚½ãƒ«
+	wc_.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
-	//ƒEƒBƒ“ƒhƒEƒNƒ‰ƒX“o˜^
-	RegisterClass(&wc);
+	//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¯ãƒ©ã‚¹ç™»éŒ²
+	RegisterClass(&wc_);
 
-	//ƒEƒBƒ“ƒhƒEƒTƒCƒY‚Ì\‘¢‘Ì‚ÉƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚ð“ü‚ê‚é
+	//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚ºã®æ§‹é€ ä½“ã«ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã‚’å…¥ã‚Œã‚‹
 	RECT wrc = { 0,0,kClientWidth,kClientHeight };
 
-	//ƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚ðŒ³‚ÉŽÀÛ‚ÌƒTƒCƒY‚Éwrc‚ð•ÏX‚µ‚Ä‚à‚ç‚¤
+	//ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã‚’å…ƒã«å®Ÿéš›ã®ã‚µã‚¤ã‚ºã«wrcã‚’å¤‰æ›´ã—ã¦ã‚‚ã‚‰ã†
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
-	//ƒEƒBƒ“ƒhƒE‚Ì¶¬
+	//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ç”Ÿæˆ
 	hwnd_ = CreateWindow(
-		wc.lpszClassName,//ƒNƒ‰ƒX–¼
-		title,//ƒ^ƒCƒgƒ‹ƒo[‚Ì–¼‘O
-		WS_OVERLAPPEDWINDOW,//ƒEƒBƒ“ƒhƒEƒXƒ^ƒCƒ‹
-		CW_USEDEFAULT,//•\Ž¦XÀ•W
-		CW_USEDEFAULT,//•\Ž¦YÀ•W
-		wrc.right - wrc.left,//ƒEƒBƒ“ƒhƒE‰¡•
-		wrc.bottom - wrc.top,//ƒEƒBƒ“ƒhƒEc•
-		nullptr,//eƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹
-		nullptr,//ƒƒjƒ…[ƒnƒ“ƒhƒ‹
-		wc.hInstance,//ƒCƒ“ƒXƒ^ƒ“ƒXƒnƒ“ƒhƒ‹
-		nullptr//ƒIƒvƒVƒ‡ƒ“
+		wc_.lpszClassName,//ã‚¯ãƒ©ã‚¹å
+		title,//ã‚¿ã‚¤ãƒˆãƒ«ãƒãƒ¼ã®åå‰
+		WS_OVERLAPPEDWINDOW,//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¹ã‚¿ã‚¤ãƒ«
+		CW_USEDEFAULT,//è¡¨ç¤ºXåº§æ¨™
+		CW_USEDEFAULT,//è¡¨ç¤ºYåº§æ¨™
+		wrc.right - wrc.left,//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦æ¨ªå¹…
+		wrc.bottom - wrc.top,//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç¸¦å¹…
+		nullptr,//è¦ªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+		nullptr,//ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãƒãƒ³ãƒ‰ãƒ«
+		wc_.hInstance,//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãƒãƒ³ãƒ‰ãƒ«
+		nullptr//ã‚ªãƒ—ã‚·ãƒ§ãƒ³
 	);
 
-	//ƒEƒBƒ“ƒhƒE•\Ž¦
+#ifdef _DEBUG//ãƒ‡ãƒãƒƒã‚°ãƒ¬ã‚¤ãƒ¤ãƒ¼
+	debugController_ = nullptr;
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController_)))) {
+		//ãƒ‡ãƒãƒƒã‚°ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’æœ‰åŠ¹åŒ–
+		debugController_->EnableDebugLayer();
+		//GPUå´ã§ã‚‚ãƒã‚§ãƒƒã‚¯ã‚’è¡Œã†
+		debugController_->SetEnableGPUBasedValidation(TRUE);
+	}
+#endif // _DEBUG
+
+	//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦è¡¨ç¤º
 	ShowWindow(hwnd_, SW_SHOW);
 }
+
+bool WinApp::Procesmessage() {
+	MSG msg{};
+
+	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	if (msg.message == WM_QUIT) // çµ‚äº†ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒæ¥ãŸã‚‰ãƒ«ãƒ¼ãƒ—ã‚’æŠœã‘ã‚‹
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void WinApp::Finalize()
+{
+	debugController_->Release();
+}
+
+
 HWND WinApp::hwnd_;
+UINT WinApp::windowStyle_;
+ID3D12Debug1* WinApp::debugController_;

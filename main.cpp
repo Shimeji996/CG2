@@ -1,7 +1,7 @@
 #include "Engine.h"
 #include "Triangle.h"
 
-const wchar_t kWindowTitle[] = { L"CG2_WinMain" };
+const wchar_t kWindowTitle[] = { L"CG2_マスダリュウ" };
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 

@@ -1,11 +1,17 @@
 ﻿#include "Engine.h"
 #include <assert.h>
 
+/***************************************************************************************
+DXC(DirectX Shader Compiler)はHLSLからDXIL(DirectX Intermediate Language)にするコンパイラー
+***************************************************************************************/
 IDxcBlob* CreateEngine::CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler)
 {
 	//これからシェーダーをコンパイルする旨をログに出す
 	Log(ConvertString(std::format(L"Begin CompileShader, path:{},profile:{}\n", filePath, profile)));
 
+	/************************************************************************
+	hlsl(High-Level Shader Language)はDirectX12の各種Shaderを記述するための言語
+	************************************************************************/
 	//hlslファイルを読む
 	IDxcBlobEncoding* shaderSource = nullptr;
 	dxCommon_->SetHr(dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource));
@@ -85,12 +91,18 @@ void CreateEngine::InitializeDxcCompiler()
 
 void CreateEngine::CreateRootSignature()
 {
+	/****************************************************************
 	//RootSignature作成
+	//ShaderとResourceをどのように関連付けるかを示したオブジェクト
+	****************************************************************/
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-	//RootParameter作成、複数設定可能な為、配列に
+	/*********************************************
+	//RootParameter作成、複数設定できるので配列。
+	//データそれぞれのBind情報である
+	*********************************************/
 	D3D12_ROOT_PARAMETER rootParameters[1] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
@@ -133,6 +145,15 @@ void CreateEngine::BlendState()
 {
 	//すべての色要素を書き込む
 	blendDesc_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+	//透明度
+	blendDesc_.RenderTarget[0].BlendEnable = true;
+	blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDesc_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDesc_.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+	blendDesc_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 }
 
 void CreateEngine::RasterizerState()
@@ -153,6 +174,11 @@ void CreateEngine::RasterizerState()
 	assert(pixelShaderBlob_ != nullptr);
 }
 
+/*********************************************************************
+RenderingPipelineはモデルデータの入力から出力までのレンダリングのための加工手順
+PipelineStateObject(PSO)は描画に関する設定が大量に詰め込まれたオブジェクト
+*********************************************************************/
+
 void CreateEngine::InitializePSO()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
@@ -160,6 +186,9 @@ void CreateEngine::InitializePSO()
 	//RootSignature
 	graphicsPipelineStateDesc.pRootSignature = rootSignature_;
 
+	/**********************************************************************
+	InputlayoutはVertexShaderへ渡す頂点データがどのようなものかを指定するオブジェクト
+	**********************************************************************/
 	//Inputlayout
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc_;
 
@@ -171,9 +200,16 @@ void CreateEngine::InitializePSO()
 	graphicsPipelineStateDesc.PS = { pixelShaderBlob_->GetBufferPointer(),
 		pixelShaderBlob_->GetBufferSize() };
 
+	/********************************************************************
+	BlendStateとはPixelShaderからの出力を画面にどのように書き込むかを設定する項目
+	********************************************************************/
 	//BlendState
 	graphicsPipelineStateDesc.BlendState = blendDesc_;
 
+	/********************************************************************
+	Rasterrizerは頂点のピクセル化
+	RasterrizerStateはRasterrizerに対する設定
+	********************************************************************/
 	//rasterizerState
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc_;
 
@@ -195,6 +231,9 @@ void CreateEngine::InitializePSO()
 	assert(SUCCEEDED(hr));
 }
 
+/*******************************
+Viewportは表示領域
+*******************************/
 void CreateEngine::ViewPort()
 {
 	//クライアント領域のサイズと一緒にして画面全体に表示

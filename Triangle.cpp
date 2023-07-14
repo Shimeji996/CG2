@@ -29,11 +29,21 @@ void CreateTriangle::Draw(const Vector4& a, const Vector4& b, const Vector4& c, 
 }
 
 void CreateTriangle::Finalize() {
+	/************************************************
+	Resourceとは動作の実行に必要な処理システムの要素や機器
+	************************************************/
 	materialResource_->Release();
 	vertexResource_->Release();
 }
 
 void CreateTriangle::SettingVertex() {
+	/************************************************
+	Bufferはデータを一時的に保持する記憶領域
+	Z-Bufferとは深度情報を格納したResource
+	Vertexは頂点のこと
+	VertexBufferView(VBV)
+	ShaderResourceView(SRV)はTextureを読むのに必要なもの
+	************************************************/
 	vertexResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(Vector4) * 3);
 	//リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();

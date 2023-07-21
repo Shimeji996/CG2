@@ -27,9 +27,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector4 data9 = { 0.8f,-0.8f,0.0f,1.0f };
 	Vector4 material3 = { 0.0f,0.0f,1.0f,1.0f };
 
-	int isFlash = 0;
-	int timer = 0;
-
 #pragma region ゲームループ
 
 	MSG msg{};
@@ -45,36 +42,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			//ゲームの処理
 			Engine->Update();
-
-			/*if (isFlash == 0) {
-				material1.w += 0.01f;
-				material2.w += 0.01f;
-			}
-
-			if (material1.w >= 1.0) {
-				timer += 1;
-			}
-
-			if (timer == 60) {
-				isFlash = 1;
-			}
-
-			if (isFlash == 1) {
-				material1.w -= 0.01f;
-				material2.w -= 0.01f;
-			}*/
-
 			Engine->BeginFrame();
-
-			//三角形描画
-			/*if (isFlash == 1) {
-				Engine->DrawTriangle(data7, data8, data9, material3);
-			}*/
 
 			Engine->DrawTriangle(data1, data2, data3, material1);
 
 			Engine->DrawTriangle(data4, data5, data6, material2);
-
+			0
 			Engine->DrawTriangle(data7, data8, data9, material3);
 
 			Engine->EndFrame();

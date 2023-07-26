@@ -2,21 +2,14 @@
 #include <assert.h>
 #include "Engine.h"
 
-void CreateTriangle::Initialize(DirectXCommon* dxCommon) {
+void CreateTriangle::Initialize(DirectXCommon* dxCommon, const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material) {
 	dxCommon_ = dxCommon;
-	SettingVertex();
-	SettingColor();
+	SettingVertex(a,b,c);
+	SettingColor(material);
 }
 
-void CreateTriangle::Draw(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material) {
-	//左下
-	vertexData_[0] = a;
-	//上
-	vertexData_[1] = b;
-	//右下
-	vertexData_[2] = c;
-
-	*materialData_ = material;
+void CreateTriangle::Draw() {
+	
 	//VBVを設定
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	//形状を設定。PS0に設定しているものとはまた別。同じものを設定する
@@ -36,7 +29,7 @@ void CreateTriangle::Finalize() {
 	vertexResource_->Release();
 }
 
-void CreateTriangle::SettingVertex() {
+void CreateTriangle::SettingVertex(const Vector4& a, const Vector4& b, const Vector4& c) {
 	/************************************************
 	Bufferはデータを一時的に保持する記憶領域
 	Z-Bufferとは深度情報を格納したResource
@@ -53,13 +46,23 @@ void CreateTriangle::SettingVertex() {
 	vertexBufferView_.StrideInBytes = sizeof(Vector4);
 	//書き込むためのアドレスを取得
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+
+	//左下
+	vertexData_[0] = a;
+	//上
+	vertexData_[1] = b;
+	//右下
+	vertexData_[2] = c;
+
 }
 
-void CreateTriangle::SettingColor() {
+void CreateTriangle::SettingColor(const Vector4& material) {
 	//マテリアル用のリソースを作る　今回はcolor1つ分
 	materialResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(Vector4));
 	//書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+
+	*materialData_ = material;
 }
 
 ID3D12Resource* CreateTriangle::CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {

@@ -256,11 +256,7 @@ void CreateEngine::ScissorRect()
 
 void CreateEngine::Initialize()
 {
-	for (int i = 0; i < 11; i++)
-	{
-		triangle_[i] = new CreateTriangle();
-		triangle_[i]->Initialize(dxCommon_);
-	}
+	
 }
 
 void CreateEngine::Initialization(WinApp* win, const wchar_t* title, int32_t width, int32_t height)
@@ -287,7 +283,7 @@ void CreateEngine::Initialization(WinApp* win, const wchar_t* title, int32_t wid
 
 void CreateEngine::BeginFrame()
 {
-	triangleCount_ = 0;
+	
 	dxCommon_->PreDraw();
 	//viewportを設定
 	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport_);
@@ -306,7 +302,7 @@ void CreateEngine::EndFrame()
 
 void CreateEngine::Finalize()
 {
-	for (int i = 0; i < 11; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		triangle_[i]->Finalize();
 	}
@@ -327,11 +323,38 @@ void CreateEngine::Finalize()
 
 void CreateEngine::Update() {}
 
-void CreateEngine::DrawTriangle(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material)
-{
-	triangleCount_++;
-	triangle_[triangleCount_]->Draw(a, b, c, material);
+void CreateEngine::Draw() {
+	for (int i = 0; i < 3; i++) {
+		triangle_[i]->Draw();
+	}
 }
+
+void CreateEngine::VariableInialize() {
+
+
+	data1[0] = { -0.4f,0.5f,0.0f,2.0f };
+	data2[0] = { 0.0f,0.8f,0.0f,2.0f };
+	data3[0] = { 0.4f,0.5f,0.0f,2.0f };
+	material[0] = {1.0f,0.0f,0.0f,1.0f};
+
+	data1[1] = {-0.8f,-0.9f,0.0f,1.0f};
+	data2[1] = {-0.6f,-0.6f,0.0f,1.0f};
+	data3[1] = {-0.4f,-0.9f,0.0f,1.0f};
+	material[1] = {0.0f,1.0f,0.0f,1.0f};
+
+	data1[2] = {0.4f,-0.7f,0.0f,1.0f};
+	data2[2] = {0.6f,-0.4f,0.0f,1.0f};
+	data3[2] = {0.8f,-0.8f,0.0f,1.0f};
+	material[2] = {0.0f,0.0f,1.0f,1.0f};
+
+	for (int i = 0; i < 3; i++)
+	{
+		triangle_[i] = new CreateTriangle();
+		triangle_[i]->Initialize(dxCommon_, data1[i], data2[i], data3[i], material[i]);
+	}
+}
+
+
 
 WinApp* CreateEngine::win_;
 DirectXCommon* CreateEngine::dxCommon_;

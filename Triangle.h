@@ -6,16 +6,16 @@ class CreateEngine;
 
 class CreateTriangle {
 public:
-	void Initialize(DirectXCommon* dxCommon);
+	void Initialize(DirectXCommon* dxCommon, const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material);
 
-	void Draw(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material);
+	void Draw();
 
 	void Finalize();
 
 private:
-	void SettingVertex();
+	void SettingVertex(const Vector4& a, const Vector4& b, const Vector4& c);
 
-	void SettingColor();
+	void SettingColor(const Vector4& material);
 
 private:
 	CreateEngine* Engine_;

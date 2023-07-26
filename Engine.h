@@ -20,13 +20,17 @@ public:
 
 	void Update();
 
+	void Draw();
+
+	void VariableInialize();
+
 	void DrawTriangle(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material);
 
 private:
 	static WinApp* win_;
 	static	DirectXCommon* dxCommon_;
 
-	CreateTriangle* triangle_[11];
+	CreateTriangle* triangle_[3];
 
 	int triangleCount_;
 
@@ -59,7 +63,13 @@ private:
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[1];
 
 	//頂点リソースにデータを書き込む
-	Vector4* vertexData_;
+	Vector4 vertexData_;
+
+	Vector4 data1[3];
+	Vector4 data2[3];
+	Vector4 data3[3];
+
+	Vector4 material[3];
 
 	IDxcBlob* CompileShader(
 		//CompileShaderするShaderファイルへのパス

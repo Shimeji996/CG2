@@ -63,13 +63,7 @@ private:
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[1];
 
 	//頂点リソースにデータを書き込む
-	Vector4 vertexData_;
-
-	Vector4 data1[3];
-	Vector4 data2[3];
-	Vector4 data3[3];
-
-	Vector4 material[3];
+	/*Vector4 vertexData_;*/
 
 	IDxcBlob* CompileShader(
 		//CompileShaderするShaderファイルへのパス

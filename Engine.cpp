@@ -1,4 +1,5 @@
 ﻿#include "Engine.h"
+#include "Triangle.h"
 #include <assert.h>
 
 /***************************************************************************************
@@ -331,26 +332,27 @@ void CreateEngine::Draw() {
 
 void CreateEngine::VariableInialize() {
 
+	Triangle tri[3] = {};
 
-	data1[0] = { -0.4f,0.5f,0.0f,2.0f };
-	data2[0] = { 0.0f,0.8f,0.0f,2.0f };
-	data3[0] = { 0.4f,0.5f,0.0f,2.0f };
-	material[0] = {1.0f,0.0f,0.0f,1.0f};
+	tri[0].v1 = { -0.4f,0.5f,0.0f,2.0f };
+	tri[0].v2 = { 0.0f,0.8f,0.0f,2.0f };
+	tri[0].v3 = { 0.4f,0.5f,0.0f,2.0f };
+	tri[0].material = { 1.0f,0.0f,0.0f,1.0f };
 
-	data1[1] = {-0.8f,-0.9f,0.0f,1.0f};
-	data2[1] = {-0.6f,-0.6f,0.0f,1.0f};
-	data3[1] = {-0.4f,-0.9f,0.0f,1.0f};
-	material[1] = {0.0f,1.0f,0.0f,1.0f};
+	tri[1].v1 = { -0.8f,-0.9f,0.0f,1.0f };
+	tri[1].v2 = { -0.6f,-0.6f,0.0f,1.0f };
+	tri[1].v3 = { -0.4f,-0.9f,0.0f,1.0f };
+	tri[1].material = { 0.0f,1.0f,0.0f,1.0f };
 
-	data1[2] = {0.4f,-0.7f,0.0f,1.0f};
-	data2[2] = {0.6f,-0.4f,0.0f,1.0f};
-	data3[2] = {0.8f,-0.8f,0.0f,1.0f};
-	material[2] = {0.0f,0.0f,1.0f,1.0f};
+	tri[2].v1 = { 0.4f,-0.7f,0.0f,1.0f };
+	tri[2].v2 = { 0.6f,-0.4f,0.0f,1.0f };
+	tri[2].v3 = { 0.8f,-0.8f,0.0f,1.0f };
+	tri[2].material = { 0.0f,0.0f,1.0f,1.0f };
 
 	for (int i = 0; i < 3; i++)
 	{
 		triangle_[i] = new CreateTriangle();
-		triangle_[i]->Initialize(dxCommon_, data1[i], data2[i], data3[i], material[i]);
+		triangle_[i]->Initialize(dxCommon_,tri[i].v1, tri[i].v2, tri[i].v3, tri[i].material);
 	}
 }
 

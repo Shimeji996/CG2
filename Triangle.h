@@ -2,6 +2,13 @@
 #include"DirectX.h"
 #include"Vector4.h"
 
+typedef struct Triangle {
+	Vector4 v1;
+	Vector4 v2;
+	Vector4 v3;
+	Vector4 material;
+};
+
 class CreateEngine;
 
 class CreateTriangle {
@@ -33,4 +40,5 @@ private:
 	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
+
 };

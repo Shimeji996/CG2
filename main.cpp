@@ -34,10 +34,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			ImGui::ShowDemoWindow();
 			Engine->Update();
-			
-			ImGui::Render();
 
 			Engine->Draw();
+
+			ImGui::Render();
 
 			Engine->EndFrame();
 

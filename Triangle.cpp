@@ -22,11 +22,6 @@ void CreateTriangle::Draw() {
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	//描画
 	dxCommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
-
-	ImGui::Begin("Triangle");
-	ImGui::ColorPicker4("color", *inputFloat);
-	ImGui::End();
-	
 }
 
 void CreateTriangle::Finalize() {

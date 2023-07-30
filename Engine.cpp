@@ -345,8 +345,10 @@ void CreateEngine::Update() {
 
 void CreateEngine::Draw() {
 	Vector4 color = *triangle_[0]->materialData_;
-	triangle_[0]->SettingColor(color);
+	ImGui::Begin("Triangle");
 	ImGui::ColorPicker4("color", &color.x);
+	ImGui::End();
+	*triangle_[0]->materialData_ = color;
 	for (int i = 0; i < 3; i++) {
 		triangle_[i]->Draw();
 	}

@@ -11,20 +11,6 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
 		return true;
 	}
-
-	DirectXCommon* DirectX = new DirectXCommon;
-
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(hwnd);
-	ImGui_ImplDX12_Init(DirectX->device_,
-		DirectX->GetSwapChainDesc()->BufferCount,
-		DirectX->GetRTVDesc()->Format,
-		DirectX->srvDescriptorHeap_,
-		DirectX->srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(),
-		DirectX->srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart()
-	);
 	
 	//メッセージに応じてゲーム固有の処理を行う
 	switch (msg) {

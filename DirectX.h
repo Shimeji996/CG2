@@ -100,6 +100,8 @@ private:
 
 	void InitializeCommand();
 
+	ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+
 	void CreateFinalRenderTargets();
 
 	void CreateFence();

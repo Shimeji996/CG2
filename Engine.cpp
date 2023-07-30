@@ -291,14 +291,13 @@ void CreateEngine::Initialization(WinApp* win, const wchar_t* title, int32_t wid
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(win_->GetHwnd());
 	ImGui_ImplDX12_Init(dxCommon_->device_,
-		dxCommon_->GetSwapChainDesc()->BufferCount,
-		dxCommon_->GetRTVDesc()->Format,
+		dxCommon_->GetSwapChainDesc().BufferCount,
+		dxCommon_->GetRTVDesc().Format,
 		dxCommon_->srvDescriptorHeap_,
 		dxCommon_->srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(),
 		dxCommon_->srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart()
 	);
 }
-
 
 void CreateEngine::BeginFrame()
 {
@@ -341,10 +340,13 @@ void CreateEngine::Finalize()
 }
 
 void CreateEngine::Update() {
-	ImGui::ShowDemoWindow();
+	
 }
 
 void CreateEngine::Draw() {
+	Vector4 color = *triangle_[0]->materialData_;
+	triangle_[0]->SettingColor(color);
+	ImGui::ColorPicker4("color", &color.x);
 	for (int i = 0; i < 3; i++) {
 		triangle_[i]->Draw();
 	}

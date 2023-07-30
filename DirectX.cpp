@@ -25,9 +25,9 @@ IDXGIAdapter4* DirectXCommon::useAdapter_;
 //D3D12Deviceの生成
 ID3D12Device* DirectXCommon::device_;
 
-DXGI_SWAP_CHAIN_DESC1* DirectXCommon::swapChainDesc;
+DXGI_SWAP_CHAIN_DESC1 DirectXCommon::swapChainDesc;
 
-D3D12_RENDER_TARGET_VIEW_DESC* DirectXCommon::rtvDesc;
+D3D12_RENDER_TARGET_VIEW_DESC DirectXCommon::rtvDesc;
 
 //コマンドキュー生成
 ID3D12CommandQueue* DirectXCommon::commandQueue_;
@@ -208,7 +208,7 @@ void DirectXCommon::CreateSwapChain() {
 	*****************************************************************/
 	//スワップチェーン
 	swapChain_ = nullptr;
-	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
+	
 	swapChainDesc.Width = WinApp::kClientWidth;//画面の幅
 	swapChainDesc.Height = WinApp::kClientHeight;//画面の高さ
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;//色の形式
@@ -256,7 +256,6 @@ void DirectXCommon::CreateFinalRenderTargets() {
 	RenderTargetView(RTV)はResourceに対して描く作業用のView
 	***************************************************/
 	//RTVの設定
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;//出力結果をSRGBに変換して書き込む
 
 	/*******************************************
@@ -315,6 +314,9 @@ void DirectXCommon::PreDraw() {
 
 void DirectXCommon::PostDraw() {
 	hr_;
+
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_);
+
 	//画面描画処理の終わり、状態を遷移
 	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
@@ -326,9 +328,7 @@ void DirectXCommon::PostDraw() {
 
 	//GPUにコマンドリストを実行させる
 	ID3D12CommandList* commandLists[] = { commandList_ };
-	/**/
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_);
-	/**/
+
 	commandQueue_->ExecuteCommandLists(1, commandLists);
 	//GPUとOSに画面の交換を行うよう通知する
 	swapChain_->Present(1, 0);

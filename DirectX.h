@@ -27,13 +27,13 @@ public:
 
 	ID3D12Device* GetDevice() { return device_; }
 
-	static DXGI_SWAP_CHAIN_DESC1* swapChainDesc;
+	static DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
 
-	DXGI_SWAP_CHAIN_DESC1* GetSwapChainDesc() { return swapChainDesc; }
+	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc; }
 
-	static D3D12_RENDER_TARGET_VIEW_DESC* rtvDesc;
+	static D3D12_RENDER_TARGET_VIEW_DESC rtvDesc;
 
-	D3D12_RENDER_TARGET_VIEW_DESC* GetRTVDesc() { return rtvDesc; }
+	D3D12_RENDER_TARGET_VIEW_DESC GetRTVDesc() { return rtvDesc; }
 
 	static ID3D12DescriptorHeap* srvDescriptorHeap_;
 	

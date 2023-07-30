@@ -1,5 +1,9 @@
 #include "Engine.h"
 #include "Triangle.h"
+#include "externals/imgui/imgui.h"
+#include "externals/imgui/imgui_impl_dx12.h"
+#include "externals/imgui/imgui_impl_win32.h"
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 const wchar_t kWindowTitle[] = { L"CG2_マスダリュウ" };
 
@@ -27,8 +31,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			//ゲームの処理
 			Engine->BeginFrame();
+			
+			ImGui_ImplDX12_NewFrame();
+			ImGui_ImplWin32_NewFrame();
+			ImGui::NewFrame();
+
 			Engine->Update();
 			
+			ImGui::Render();
+
 			Engine->Draw();
 
 			Engine->EndFrame();

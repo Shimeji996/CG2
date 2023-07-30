@@ -5,6 +5,10 @@
 #include <timeapi.h>
 #include <vector>
 #include <dxgidebug.h>
+#include "externals/imgui/imgui.h"
+#include "externals/imgui/imgui_impl_dx12.h"
+#include "externals/imgui/imgui_impl_win32.h"
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -21,6 +25,10 @@ IDXGIAdapter4* DirectXCommon::useAdapter_;
 //D3D12Deviceの生成
 ID3D12Device* DirectXCommon::device_;
 
+DXGI_SWAP_CHAIN_DESC1* DirectXCommon::swapChainDesc;
+
+D3D12_RENDER_TARGET_VIEW_DESC* DirectXCommon::rtvDesc;
+
 //コマンドキュー生成
 ID3D12CommandQueue* DirectXCommon::commandQueue_;
 
@@ -36,6 +44,8 @@ IDXGISwapChain4* DirectXCommon::swapChain_;
 //ディスクリプタヒープの生成
 ID3D12DescriptorHeap* DirectXCommon::rtvDescriptorHeap_;
 
+ID3D12DescriptorHeap* DirectXCommon::srvDescriptorHeap_;
+
 //RTVを２つ作るのでディスクリプタを２つ用意
 D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::rtvHandles_[2];
 ID3D12Resource* DirectXCommon::swapChainResources_[2];
@@ -49,6 +59,8 @@ int32_t DirectXCommon::backBufferWidth_;
 int32_t DirectXCommon::backBufferHeight_;
 
 HRESULT DirectXCommon::hr_;
+
+
 
 void DirectXCommon::Initialization(WinApp* win, const wchar_t* title, int32_t backBufferWidth, int32_t backBufferHeight) {
 
@@ -206,21 +218,6 @@ void DirectXCommon::CreateSwapChain() {
 	hr_ = dxgiFactory_->CreateSwapChainForHwnd(commandQueue_, winApp_->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain_));
 	assert(SUCCEEDED(hr_));
 
-	/*********************************************************************************
-	ディスクリプタヒープの生成
-	Viewの情報を格納している場所を束ねたもの
-	ViewはResourceに対してどのような処理を行う
-	かの手順をまとめたもの
-	heapは動的なデータ領域を確保する
-	*********************************************************************************/
-	rtvDescriptorHeap_ = nullptr;
-	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
-	rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;//レンダーターゲットビュー用
-	rtvDescriptorHeapDesc.NumDescriptors = 2;//ダブルバッファ用に２つ　多くても構わない
-	hr_ = device_->CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap_));
-	//ディスクリプタヒープが生成失敗の為、起動しない
-	assert(SUCCEEDED(hr_));
-
 	//SwapChainからResourceを引っ張ってくる
 	swapChainResources_[0] = { nullptr };
 	swapChainResources_[1] = { nullptr };
@@ -229,6 +226,25 @@ void DirectXCommon::CreateSwapChain() {
 	assert(SUCCEEDED(hr_));
 
 	hr_ = swapChain_->GetBuffer(1, IID_PPV_ARGS(&swapChainResources_[1]));
+	assert(SUCCEEDED(hr_));
+}
+
+ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device_, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible) {
+
+	/*********************************************************************************
+	ディスクリプタヒープの生成
+	Viewの情報を格納している場所を束ねたもの
+	ViewはResourceに対してどのような処理を行う
+	かの手順をまとめたもの
+	heapは動的なデータ領域を確保する
+	*********************************************************************************/
+	ID3D12DescriptorHeap* rtvDescriptorHeap_ = CreateDescriptorHeap(device_,D3D12_DESCRIPTOR_HEAP_TYPE_RTV,2,false);
+	ID3D12DescriptorHeap* srvDescriptorHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	D3D12_DESCRIPTOR_HEAP_DESC rtvDescriptorHeapDesc{};
+	rtvDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;//レンダーターゲットビュー用
+	rtvDescriptorHeapDesc.NumDescriptors = 2;//ダブルバッファ用に２つ　多くても構わない
+	HRESULT hr_ = device_->CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(&rtvDescriptorHeap_));
+	//ディスクリプタヒープが生成失敗の為、起動しない
 	assert(SUCCEEDED(hr_));
 }
 
@@ -290,6 +306,8 @@ void DirectXCommon::PreDraw() {
 	//指定した色で画面全体をクリアする
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };//青っぽい色、RGBA順
 	commandList_->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
+	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_ };
+	commandList_->SetDescriptorHeaps(1, descriptorHeaps);
 }
 
 void DirectXCommon::PostDraw() {
@@ -305,6 +323,9 @@ void DirectXCommon::PostDraw() {
 
 	//GPUにコマンドリストを実行させる
 	ID3D12CommandList* commandLists[] = { commandList_ };
+	/**/
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_);
+	/**/
 	commandQueue_->ExecuteCommandLists(1, commandLists);
 	//GPUとOSに画面の交換を行うよう通知する
 	swapChain_->Present(1, 0);

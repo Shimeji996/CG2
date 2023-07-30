@@ -21,9 +21,22 @@ public:
 
 	void SetHr(HRESULT a) { this->hr_ = a; }
 
+	ID3D12GraphicsCommandList* GetCommandList() { return commandList_; }
+
+	static ID3D12Device* device_;
+
 	ID3D12Device* GetDevice() { return device_; }
 
-	ID3D12GraphicsCommandList* GetCommandList() { return commandList_; }
+	static DXGI_SWAP_CHAIN_DESC1* swapChainDesc;
+
+	DXGI_SWAP_CHAIN_DESC1* GetSwapChainDesc() { return swapChainDesc; }
+
+	static D3D12_RENDER_TARGET_VIEW_DESC* rtvDesc;
+
+	D3D12_RENDER_TARGET_VIEW_DESC* GetRTVDesc() { return rtvDesc; }
+
+	static ID3D12DescriptorHeap* srvDescriptorHeap_;
+	
 
 private:
 	static WinApp* winApp_;
@@ -34,10 +47,6 @@ private:
 
 	//使用するアダプタ用の変数
 	static IDXGIAdapter4* useAdapter_;
-	//
-
-	//D3D12Deviceの生成
-	static	ID3D12Device* device_;
 	//
 
 	//コマンドキュー生成

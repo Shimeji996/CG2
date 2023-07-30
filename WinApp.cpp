@@ -1,7 +1,31 @@
 ﻿#include "WinApp.h"
+#include "DirectX.h"
+#include "externals/imgui/imgui.h"
+#include "externals/imgui/imgui_impl_dx12.h"
+#include "externals/imgui/imgui_impl_win32.h"
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 //ウィンドウプロシージャ
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+	
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
+		return true;
+	}
+
+	DirectXCommon* DirectX = new DirectXCommon;
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGui_ImplWin32_Init(hwnd);
+	ImGui_ImplDX12_Init(DirectX->device_,
+		DirectX->GetSwapChainDesc()->BufferCount,
+		DirectX->GetRTVDesc()->Format,
+		DirectX->srvDescriptorHeap_,
+		DirectX->srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(),
+		DirectX->srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart()
+	);
+	
 	//メッセージに応じてゲーム固有の処理を行う
 	switch (msg) {
 		//ウィンドウが破棄された
@@ -64,6 +88,7 @@ void WinApp::CreateWindowView(const wchar_t* title, int32_t clientWidth, int32_t
 }
 
 bool WinApp::Procesmessage() {
+
 	MSG msg{};
 
 	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {

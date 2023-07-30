@@ -1,6 +1,10 @@
 ﻿#include "Engine.h"
 #include "Triangle.h"
 #include <assert.h>
+#include "externals/imgui/imgui.h"
+#include "externals/imgui/imgui_impl_dx12.h"
+#include "externals/imgui/imgui_impl_win32.h"
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 /***************************************************************************************
 DXC(DirectX Shader Compiler)はHLSLからDXIL(DirectX Intermediate Language)にするコンパイラー
@@ -322,12 +326,17 @@ void CreateEngine::Finalize()
 	dxCommon_->Finalize();
 }
 
-void CreateEngine::Update() {}
+void CreateEngine::Update() {
+	ImGui::ShowDemoWindow();
+}
 
 void CreateEngine::Draw() {
 	for (int i = 0; i < 3; i++) {
 		triangle_[i]->Draw();
 	}
+
+
+
 }
 
 void CreateEngine::VariableInialize() {

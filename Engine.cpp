@@ -108,10 +108,13 @@ void CreateEngine::CreateRootSignature()
 	//RootParameter作成、複数設定できるので配列。
 	//データそれぞれのBind情報である
 	*********************************************/
-	D3D12_ROOT_PARAMETER rootParameters[1] = {};
+	D3D12_ROOT_PARAMETER rootParameters[2] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
 	rootParameters[0].Descriptor.ShaderRegister = 0;//レジスタ番号0とバインド
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//VertexShaderで使う
+	rootParameters[1].Descriptor.ShaderRegister = 0;//レジスタ番号0とバインド
 	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters);//配列の長さ
 
@@ -340,7 +343,8 @@ void CreateEngine::Finalize()
 }
 
 void CreateEngine::Update() {
-	
+	transform_.rotate.y += 0.03f;
+	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 }
 
 void CreateEngine::Draw() {
@@ -350,11 +354,13 @@ void CreateEngine::Draw() {
 	ImGui::End();
 	*triangle_[0]->materialData_ = color;
 	for (int i = 0; i < 3; i++) {
-		triangle_[i]->Draw();
+		triangle_[i]->Draw(worldMatrix_);
 	}
 }
 
 void CreateEngine::VariableInialize() {
+
+	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
 	Triangle tri[3] = {};
 

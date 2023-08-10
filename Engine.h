@@ -66,6 +66,9 @@ private:
 
 	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[1];
 
+	Transform transform_;
+	Matrix4x4 worldMatrix_;
+
 	//頂点リソースにデータを書き込む
 	/*Vector4 vertexData_;*/
 

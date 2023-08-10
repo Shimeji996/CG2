@@ -5,6 +5,12 @@ float4 main( float4 pos : POSITION ) : SV_POSITION
 }
 *****************************************************/
 
+struct TransformationMatrix {
+	float32_t4x4 WVP;
+};
+
+ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b0);
+
 /***************************************************************
 ShaderとはGPU上で動くプログラムでレンダリングパイプラインの中核をなす機能
 VertexShaderは頂点に対して加工を行うShader
@@ -20,6 +26,6 @@ struct VertexShaderInput {
 
 VertexShaderOutput main(VertexShaderInput input) {
 	VertexShaderOutput output;
-	output.position = input.position;
+	output.position = mul(input.position, gTransformationMatrix.WVP);
 	return output;
 }

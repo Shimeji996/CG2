@@ -10,16 +10,20 @@ void CreateTriangle::Initialize(DirectXCommon* dxCommon, const Vector4& a, const
 	dxCommon_ = dxCommon;
 	SettingVertex(a,b,c);
 	SettingColor(material);
+	MoveMatrix();
 }
 
-void CreateTriangle::Draw() {
+void CreateTriangle::Draw(const Matrix4x4& data) {
 	
+	*wvpData_ = data;
+
 	//VBVを設定
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	//形状を設定。PS0に設定しているものとはまた別。同じものを設定する
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//マテリアルCBufferの場所を設定
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	//描画
 	dxCommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 }
@@ -30,6 +34,7 @@ void CreateTriangle::Finalize() {
 	************************************************/
 	materialResource_->Release();
 	vertexResource_->Release();
+	wvpResource_->Release();
 }
 
 void CreateTriangle::SettingVertex(const Vector4& a, const Vector4& b, const Vector4& c) {
@@ -71,6 +76,13 @@ void CreateTriangle::SettingColor(const Vector4& material) {
 	inputFloat[1] = &materialData_->y;
 	inputFloat[2] = &materialData_->z;
 	inputFloat[3] = &materialData_->w;
+}
+
+void CreateTriangle::MoveMatrix() {
+
+	wvpResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(Matrix4x4));
+	wvpResource_->Map(0, NULL, reinterpret_cast<void**>(&wvpData_));
+	*wvpData_ = MakeIdentity4x4();
 }
 
 ID3D12Resource* CreateTriangle::CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {

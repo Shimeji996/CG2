@@ -24,21 +24,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	float materialColor2[3] = { material[2].x,material[2].y,material[2].z };
 
 	// 左下の三角形
-	triangleVertexData[0][0] = { -0.6f,-0.4f,0.0f,1.0f };
-	triangleVertexData[0][1] = { -0.4f,0.0f,0.0f,1.0f };
-	triangleVertexData[0][2] = { -0.2f,-0.4f,0.0f,1.0f };
+	triangleVertexData[0][0] = { -0.8f,-0.9f,0.0f,1.0f };
+	triangleVertexData[0][1] = { -0.6f,-0.6f,0.0f,1.0f };
+	triangleVertexData[0][2] = { -0.4f,-0.9f,0.0f,1.0f };
 	material[0] = { material[0].x,material[0].y,material[0].z,1.0f };
 
 	// 真ん中の三角形
-	triangleVertexData[1][0] = { -0.2f,0.4f,0.0f,1.0f };
-	triangleVertexData[1][1] = { 0.0f,0.8f,0.0f,1.0f };
-	triangleVertexData[1][2] = { 0.2f,0.4f,0.0f,1.0f };
+	triangleVertexData[1][0] = { -0.4f,0.5f,0.0f,2.0f };
+	triangleVertexData[1][1] = { 0.0f,0.8f,0.0f,2.0f };
+	triangleVertexData[1][2] = { 0.4f,0.5f,0.0f,2.0f };
 	material[1] = { material[1].x,material[1].y,material[1].z,1.0f };
 
 	// 右下の三角形
-	triangleVertexData[2][0] = { 0.2f,-0.4f,0.0f,1.0f };
-	triangleVertexData[2][1] = { 0.4f,0.0f,0.0f,1.0f };
-	triangleVertexData[2][2] = { 0.6f,-0.4f,0.0f,1.0f };
+	triangleVertexData[2][0] = { 0.4f,-0.7f,0.0f,1.0f };
+	triangleVertexData[2][1] = { 0.6f,-0.4f,0.0f,1.0f };
+	triangleVertexData[2][2] = { 0.8f,-0.8f,0.0f,1.0f };
 	material[2] = { material[2].x,material[2].y,material[2].z,1.0f };
 
 	MSG msg{};

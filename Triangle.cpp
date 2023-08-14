@@ -1,91 +1,89 @@
 ﻿#include "Triangle.h"
 #include <assert.h>
 #include "Engine.h"
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-void CreateTriangle::Initialize(DirectXCommon* dxCommon, const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material) {
+void Triangle::Initialize(DirectXCommon* dxCommon, MyEngine* engine)
+{
 	dxCommon_ = dxCommon;
-	SettingVertex(a,b,c);
-	SettingColor(material);
+	engine_ = engine;
+	SettingVertex();
+	SettingColor();
 	MoveMatrix();
 }
 
-void CreateTriangle::Draw(const Matrix4x4& data) {
-	
-	*wvpData_ = data;
+void Triangle::Draw(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material, const Matrix4x4& wvpdata)
+{
+	//左下
+	vertexData_[0].position = a;
+	vertexData_[0].texcoord = { 0.0f,1.0f };
+
+	//上
+	vertexData_[1].position = b;
+	vertexData_[1].texcoord = { 0.5f,0.0f };
+
+	//右下
+	vertexData_[2].position = c;
+	vertexData_[2].texcoord = { 1.0f,1.0f };
+
+	*materialData_ = material;
+
+	*wvpData_ = wvpdata;
 
 	//VBVを設定
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+
 	//形状を設定。PS0に設定しているものとはまた別。同じものを設定する
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 	//マテリアルCBufferの場所を設定
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+
+	//SRVのDescriptorTableの先頭を設定。2はrootPrameter[2]である。
+	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, engine_->GetTextureHandleGPU());
+
 	//描画
 	dxCommon_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+
 }
 
-void CreateTriangle::Finalize() {
-	/************************************************
-	Resourceとは動作の実行に必要な処理システムの要素や機器
-	************************************************/
+void Triangle::Release()
+{
 	materialResource_->Release();
 	vertexResource_->Release();
 	wvpResource_->Release();
 }
 
-void CreateTriangle::SettingVertex(const Vector4& a, const Vector4& b, const Vector4& c) {
-	/************************************************
-	Bufferはデータを一時的に保持する記憶領域
-	Z-Bufferとは深度情報を格納したResource
-	Vertexは頂点のこと
-	VertexBufferView(VBV)
-	ShaderResourceView(SRV)はTextureを読むのに必要なもの
-	************************************************/
-	vertexResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(Vector4) * 3);
+void Triangle::SettingVertex()
+{
+	vertexResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(VertexData) * 3);
 	//リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点3つ分のサイズ
-	vertexBufferView_.SizeInBytes = sizeof(Vector4) * 3;
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 3;
 	//1頂点当たりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(Vector4);
+	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 	//書き込むためのアドレスを取得
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
-
-	//左下
-	vertexData_[0] = a;
-	//上
-	vertexData_[1] = b;
-	//右下
-	vertexData_[2] = c;
-
 }
 
-void CreateTriangle::SettingColor(const Vector4& material) {
+void Triangle::SettingColor()
+{
 	//マテリアル用のリソースを作る　今回はcolor1つ分
 	materialResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(Vector4));
 	//書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
-
-	*materialData_ = material;
-
-	inputFloat[0] = &materialData_->x;
-	inputFloat[1] = &materialData_->y;
-	inputFloat[2] = &materialData_->z;
-	inputFloat[3] = &materialData_->w;
 }
 
-void CreateTriangle::MoveMatrix() {
-
+void Triangle::MoveMatrix()
+{
 	wvpResource_ = CreateBufferResource(dxCommon_->GetDevice(), sizeof(Matrix4x4));
 	wvpResource_->Map(0, NULL, reinterpret_cast<void**>(&wvpData_));
 	*wvpData_ = MakeIdentity4x4();
 }
 
-ID3D12Resource* CreateTriangle::CreateBufferResource(ID3D12Device* device, size_t sizeInBytes) {
+ID3D12Resource* Triangle::CreateBufferResource(ID3D12Device* device, size_t sizeInBytes)
+{
 	//頂点リソース用のヒープの設定
 	D3D12_HEAP_PROPERTIES uplodeHeapProperties{};
 	uplodeHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;//UploadHeapを使う

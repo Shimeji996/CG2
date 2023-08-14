@@ -1,39 +1,37 @@
-#pragma once
-#include"DirectX.h"
-#include"Vector4.h"
-#include"Matrix.h"
+Ôªø#pragma once
+#include "DirectX.h"
+#include "Vector3.h"
+#include "Vector4.h"
+#include "Matrix4x4.h"
+#include "String.h"
+#include "Vertex.h"
 
-typedef struct Triangle {
-	Vector4 v1;
-	Vector4 v2;
-	Vector4 v3;
-	Vector4 material;
-};
+class MyEngine;
 
-class CreateEngine;
-
-class CreateTriangle {
+class Triangle
+{
 public:
-	void Initialize(DirectXCommon* dxCommon, const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material);
+	void Initialize(DirectXCommon* dxCommon, MyEngine* engine);
 
-	void Draw(const Matrix4x4& data);
+	void Draw(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material, const Matrix4x4& wvpdata);
 
-	void Finalize();
+	void Release();
 
-	void SettingVertex(const Vector4& a, const Vector4& b, const Vector4& c);
+private:
+	void SettingVertex();
 
-	void SettingColor(const Vector4& material);
+	void SettingColor();
 
 	void MoveMatrix();
 
-	Vector4* materialData_;
-
 private:
-	CreateEngine* Engine_;
+	MyEngine* engine_;
 
 	DirectXCommon* dxCommon_;
 
-	Vector4* vertexData_;
+	VertexData* vertexData_;
+
+	Vector4* materialData_;
 
 	ID3D12Resource* vertexResource_;
 
@@ -41,13 +39,10 @@ private:
 
 	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
 
-	//WVPópÇÃÉäÉ\Å[ÉX
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
+
+	//WVPÁî®„ÅÆ„É™„ÇΩ„Éº„Çπ
 	ID3D12Resource* wvpResource_;
 
 	Matrix4x4* wvpData_;
-
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
-
-	float* inputFloat[4];
-
 };

@@ -5,49 +5,87 @@ const wchar_t kWindowTitle[] = { L"CG2_マスダリュウ" };
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
+	//COMの初期化
+	CoInitializeEx(0, COINIT_MULTITHREADED);
+
 	//初期化
 	WinApp* win_ = nullptr;
-	CreateEngine* Engine = new CreateEngine;
-	Engine->Initialization(win_, kWindowTitle, 1280, 720);
+	MyEngine* engine = new MyEngine;
+	engine->Initialization(win_, kWindowTitle, 1280, 720);
 
-	Engine->VariableInialize();
+	engine->Initialize();
 
-#pragma region ゲームループ
+	engine->LoadTexture("resources/uvChecker.png");
+
+	Vector4 triangleVertexData[3][3];
+	Vector4 material[3] = { { 1,1,1,1 },{ 1,1,1,1 },{ 1,1,1,1 } };
+	float materialColor0[3] = { material[0].x,material[0].y,material[0].z };
+	float materialColor1[3] = { material[1].x,material[1].y,material[1].z };
+	float materialColor2[3] = { material[2].x,material[2].y,material[2].z };
+
+	// 左下の三角形
+	triangleVertexData[0][0] = { -0.6f,-0.4f,0.0f,1.0f };
+	triangleVertexData[0][1] = { -0.4f,0.0f,0.0f,1.0f };
+	triangleVertexData[0][2] = { -0.2f,-0.4f,0.0f,1.0f };
+	material[0] = { material[0].x,material[0].y,material[0].z,1.0f };
+
+	// 真ん中の三角形
+	triangleVertexData[1][0] = { -0.2f,0.4f,0.0f,1.0f };
+	triangleVertexData[1][1] = { 0.0f,0.8f,0.0f,1.0f };
+	triangleVertexData[1][2] = { 0.2f,0.4f,0.0f,1.0f };
+	material[1] = { material[1].x,material[1].y,material[1].z,1.0f };
+
+	// 右下の三角形
+	triangleVertexData[2][0] = { 0.2f,-0.4f,0.0f,1.0f };
+	triangleVertexData[2][1] = { 0.4f,0.0f,0.0f,1.0f };
+	triangleVertexData[2][2] = { 0.6f,-0.4f,0.0f,1.0f };
+	material[2] = { material[2].x,material[2].y,material[2].z,1.0f };
 
 	MSG msg{};
 
-	while (msg.message != WM_QUIT) {
-
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-
+	while (true)
+	{
+		//windowのメッセージを最優先で処理させる
+		if (win_->Procesmessage()) {
+			break;
 		}
-		else {
 
-			//ゲームの処理
-			Engine->BeginFrame();
-			
-			ImGui_ImplDX12_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
+		//ゲームの処理
+		engine->Update();
 
-			ImGui::ShowDemoWindow();
-			Engine->Update();
+		engine->BeginFrame();
 
-			Engine->Draw();
+		ImGui::Begin("Color");
+		ImGui::ColorEdit3("LeftTriangleColor", materialColor0);
+		ImGui::ColorEdit3("CenterTriangleColor", materialColor1);
+		ImGui::ColorEdit3("RightTriangleColor", materialColor2);
+		ImGui::End();
 
-			ImGui::Render();
+		material[0].x = materialColor0[0];
+		material[0].y = materialColor0[1];
+		material[0].z = materialColor0[2];
 
-			Engine->EndFrame();
+		material[1].x = materialColor1[0];
+		material[1].y = materialColor1[1];
+		material[1].z = materialColor1[2];
 
+		material[2].x = materialColor2[0];
+		material[2].y = materialColor2[1];
+		material[2].z = materialColor2[2];
+
+		for (int i = 0; i < 3; i++)
+		{
+			//三角形描画
+			engine->DrawTriangle(triangleVertexData[i][0], triangleVertexData[i][1], triangleVertexData[i][2], material[i]);
 		}
+
+		engine->EndFrame();
 	}
 
-#pragma endregion
+	//解放処理
+	engine->Release();
 
-	OutputDebugStringA("Hello,DirectX!\n");
+	CoUninitialize();
 
-	Engine->Finalize();
 	return 0;
 }

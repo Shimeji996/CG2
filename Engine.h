@@ -1,15 +1,17 @@
 ﻿#pragma once
 #include "DirectX.h"
 #include <dxcapi.h>
+#include "Vector3.h"
 #include"Vector4.h"
 #include "Triangle.h"
+#include "Matrix.h"
+#include "externals/DirectXTex/DirectXTex.h"
+#include "String.h"
+#include "Vertex.h"
 #pragma comment(lib,"dxcompiler.lib")
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-class CreateEngine
+
+class MyEngine
 {
 public:
 	void Initialize();
@@ -20,23 +22,25 @@ public:
 
 	void EndFrame();
 
-	void Finalize();
+	void Release();
 
 	void Update();
 
-	void Draw();
-
-	void VariableInialize();
-
 	void DrawTriangle(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material);
 
+	DirectX::ScratchImage LoadTexture(const std::string& filePath);
+
+	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandleGPU() { return textureSrvHandleGPU_; }
+
 private:
-	static WinApp* win_;
+	static WinApp* winApp_;
 	static	DirectXCommon* dxCommon_;
 
-	CreateTriangle* triangle_[3];
+	Triangle* triangle_[11];
 
 	int triangleCount_;
+
+	const int kMaxTriangle = 5;
 
 	IDxcUtils* dxcUtils_;
 	IDxcCompiler3* dxcCompiler_;
@@ -64,13 +68,13 @@ private:
 	D3D12_VIEWPORT viewport_{};
 	D3D12_RECT scissorRect_{};
 
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[1];
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[2];
+
+	//頂点リソースにデータを書き込む
+	Vector4* vertexData_;
 
 	Transform transform_;
 	Matrix4x4 worldMatrix_;
-
-	//頂点リソースにデータを書き込む
-	/*Vector4 vertexData_;*/
 
 	IDxcBlob* CompileShader(
 		//CompileShaderするShaderファイルへのパス
@@ -82,6 +86,17 @@ private:
 		IDxcCompiler3* dxcCompiler,
 		IDxcIncludeHandler* includeHandler
 	);
+
+	ID3D12Resource* textureResource_ = nullptr;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_;
+
+	DirectX::ScratchImage OpenImage(const std::string& filePath);
+
+	ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata);
+
+	void UploadTexturData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 
 	void InitializeDxcCompiler();
 	void CreateRootSignature();

@@ -1,35 +1,23 @@
-/*********************************************
-float4 main() : SV_TARGET
-{
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
-}
-*********************************************/
+#include "Object3d.hlsli"
 
-/*********************************************
-Materialは色など三角形の表面の材質を決定するもの
-*********************************************/
-struct Material {
+struct Material
+{
 	float32_t4 color;
 };
 
-/*********************************************
-ConstantBufferはShaderにCPUから値を渡すもの
-registerはShader上でのResource配置情報
-*********************************************/
 ConstantBuffer<Material>gMaterial : register(b0);
+Texture2D<float32_t4>gTexture : register(t0);
+SamplerState gSampler : register(s0);
 
-/***********************************************************************************
-PixelShaderは実際に画面に打つPixelの色を決めるShader
-VertexShaderの出力を補間した値などを使いながらPixelの色を決めOutputMerger(出力結合)に引き渡す
-PIXはピクセルのこと
-***********************************************************************************/
-
-struct PixelShaderOutput {
+struct PixelShaderOutput
+{
 	float32_t4 color : SV_TARGET0;
 };
 
-PixelShaderOutput main() {
+PixelShaderOutput main(VertexShaderOutput input)
+{
 	PixelShaderOutput output;
-	output.color = gMaterial.color;
+	float32_t4 textureColor = gTexture.Sample(gSampler, input.texcoord);
+	output.color = gMaterial.color * textureColor;
 	return output;
 }

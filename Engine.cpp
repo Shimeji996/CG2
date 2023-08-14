@@ -1,22 +1,11 @@
 ﻿#include "Engine.h"
-#include "Triangle.h"
 #include <assert.h>
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-/***************************************************************************************
-DXC(DirectX Shader Compiler)はHLSLからDXIL(DirectX Intermediate Language)にするコンパイラー
-***************************************************************************************/
-IDxcBlob* CreateEngine::CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler)
+IDxcBlob* MyEngine::CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler)
 {
 	//これからシェーダーをコンパイルする旨をログに出す
 	Log(ConvertString(std::format(L"Begin CompileShader, path:{},profile:{}\n", filePath, profile)));
 
-	/************************************************************************
-	hlsl(High-Level Shader Language)はDirectX12の各種Shaderを記述するための言語
-	************************************************************************/
 	//hlslファイルを読む
 	IDxcBlobEncoding* shaderSource = nullptr;
 	dxCommon_->SetHr(dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource));
@@ -77,7 +66,7 @@ IDxcBlob* CreateEngine::CompileShader(const std::wstring& filePath, const wchar_
 	return shaderBlob;
 }
 
-void CreateEngine::InitializeDxcCompiler()
+void MyEngine::InitializeDxcCompiler()
 {
 	HRESULT hr;
 	dxcUtils_ = nullptr;
@@ -94,21 +83,15 @@ void CreateEngine::InitializeDxcCompiler()
 	assert(SUCCEEDED(hr));
 }
 
-void CreateEngine::CreateRootSignature()
+void MyEngine::CreateRootSignature()
 {
-	/****************************************************************
 	//RootSignature作成
-	//ShaderとResourceをどのように関連付けるかを示したオブジェクト
-	****************************************************************/
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-	/*********************************************
-	//RootParameter作成、複数設定できるので配列。
-	//データそれぞれのBind情報である
-	*********************************************/
-	D3D12_ROOT_PARAMETER rootParameters[2] = {};
+	//RootParameter作成、複数設定可能な為、配列に
+	D3D12_ROOT_PARAMETER rootParameters[3] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
 	rootParameters[0].Descriptor.ShaderRegister = 0;//レジスタ番号0とバインド
@@ -117,6 +100,30 @@ void CreateEngine::CreateRootSignature()
 	rootParameters[1].Descriptor.ShaderRegister = 0;//レジスタ番号0とバインド
 	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters);//配列の長さ
+
+	//DescriptorRange
+	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+	descriptorRange[0].BaseShaderRegister = 0;
+	descriptorRange[0].NumDescriptors = 1;
+	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
+
+	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
+	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;
+	staticSamplers[0].ShaderRegister = 0;
+	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	descriptionRootSignature.pStaticSamplers = staticSamplers;
+	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
 	//シリアライズしてバイナリにする
 	signatureBlob_ = nullptr;
@@ -138,33 +145,29 @@ void CreateEngine::CreateRootSignature()
 	assert(SUCCEEDED(hr));
 }
 
-void CreateEngine::CreateInputlayOut()
+void MyEngine::CreateInputlayOut()
 {
 	inputElementDescs_[0].SemanticName = "POSITION";
 	inputElementDescs_[0].SemanticIndex = 0;
 	inputElementDescs_[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	inputElementDescs_[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
+	inputElementDescs_[1].SemanticName = "TEXCOORD";
+	inputElementDescs_[1].SemanticIndex = 0;
+	inputElementDescs_[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+	inputElementDescs_[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
 	inputLayoutDesc_.pInputElementDescs = inputElementDescs_;
 	inputLayoutDesc_.NumElements = _countof(inputElementDescs_);
 }
 
-void CreateEngine::BlendState()
+void MyEngine::BlendState()
 {
 	//すべての色要素を書き込む
 	blendDesc_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
-	//透明度
-	blendDesc_.RenderTarget[0].BlendEnable = true;
-	blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-	blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-	blendDesc_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-	blendDesc_.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-	blendDesc_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 }
 
-void CreateEngine::RasterizerState()
+void MyEngine::RasterizerState()
 {
 	//裏面（時計回り）を表示しない
 	rasterizerDesc_.CullMode = D3D12_CULL_MODE_BACK;
@@ -182,21 +185,13 @@ void CreateEngine::RasterizerState()
 	assert(pixelShaderBlob_ != nullptr);
 }
 
-/*********************************************************************
-RenderingPipelineはモデルデータの入力から出力までのレンダリングのための加工手順
-PipelineStateObject(PSO)は描画に関する設定が大量に詰め込まれたオブジェクト
-*********************************************************************/
-
-void CreateEngine::InitializePSO()
+void MyEngine::InitializePSO()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 
 	//RootSignature
 	graphicsPipelineStateDesc.pRootSignature = rootSignature_;
 
-	/**********************************************************************
-	InputlayoutはVertexShaderへ渡す頂点データがどのようなものかを指定するオブジェクト
-	**********************************************************************/
 	//Inputlayout
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc_;
 
@@ -208,16 +203,9 @@ void CreateEngine::InitializePSO()
 	graphicsPipelineStateDesc.PS = { pixelShaderBlob_->GetBufferPointer(),
 		pixelShaderBlob_->GetBufferSize() };
 
-	/********************************************************************
-	BlendStateとはPixelShaderからの出力を画面にどのように書き込むかを設定する項目
-	********************************************************************/
 	//BlendState
 	graphicsPipelineStateDesc.BlendState = blendDesc_;
 
-	/********************************************************************
-	Rasterrizerは頂点のピクセル化
-	RasterrizerStateはRasterrizerに対する設定
-	********************************************************************/
 	//rasterizerState
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc_;
 
@@ -228,7 +216,7 @@ void CreateEngine::InitializePSO()
 	//利用するトポロジ（形状）のタイプ。三角形
 	graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-	//どのように画面に色を打ち込むのかの設定（気にしなく良い）
+	//どのように画面に色を打ち込むのかの設定（気にしなくて良い）
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
@@ -239,10 +227,7 @@ void CreateEngine::InitializePSO()
 	assert(SUCCEEDED(hr));
 }
 
-/*******************************
-Viewportは表示領域
-*******************************/
-void CreateEngine::ViewPort()
+void MyEngine::ViewPort()
 {
 	//クライアント領域のサイズと一緒にして画面全体に表示
 	viewport_.Width = WinApp::kClientWidth;
@@ -253,7 +238,7 @@ void CreateEngine::ViewPort()
 	viewport_.MaxDepth = 1.0f;
 }
 
-void CreateEngine::ScissorRect()
+void MyEngine::ScissorRect()
 {
 	//シザー短形
 	scissorRect_.left = 0;
@@ -262,15 +247,19 @@ void CreateEngine::ScissorRect()
 	scissorRect_.bottom = WinApp::kClientHeight;
 }
 
-void CreateEngine::Initialize()
+void MyEngine::Initialize()
 {
-	
+	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	for (int i = 0; i < 5; i++)
+	{
+		triangle_[i] = new Triangle();
+		triangle_[i]->Initialize(dxCommon_, this);
+	}
 }
 
-void CreateEngine::Initialization(WinApp* win, const wchar_t* title, int32_t width, int32_t height)
+void MyEngine::Initialization(WinApp* win, const wchar_t* title, int32_t width, int32_t height)
 {
-	dxCommon_ = new DirectXCommon;
-
+	dxCommon_ = new DirectXCommon();
 	dxCommon_->Initialization(win, title, win->kClientWidth, win->kClientHeight);
 
 	InitializeDxcCompiler();
@@ -288,23 +277,12 @@ void CreateEngine::Initialization(WinApp* win, const wchar_t* title, int32_t wid
 	ViewPort();
 
 	ScissorRect();
-
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(win_->GetHwnd());
-	ImGui_ImplDX12_Init(dxCommon_->device_,
-		dxCommon_->GetSwapChainDesc().BufferCount,
-		dxCommon_->GetRTVDesc().Format,
-		dxCommon_->srvDescriptorHeap_,
-		dxCommon_->srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(),
-		dxCommon_->srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart()
-	);
 }
 
-void CreateEngine::BeginFrame()
+
+void MyEngine::BeginFrame()
 {
-	
+	triangleCount_ = 0;
 	dxCommon_->PreDraw();
 	//viewportを設定
 	dxCommon_->GetCommandList()->RSSetViewports(1, &viewport_);
@@ -314,18 +292,23 @@ void CreateEngine::BeginFrame()
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_);
 	//PS0を設定
 	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_);
+	//開発用UIの処理
+	ImGui::ShowDemoWindow();
 }
 
-void CreateEngine::EndFrame()
+void MyEngine::EndFrame()
 {
+	ImGui::Render();
+
 	dxCommon_->PostDraw();
 }
 
-void CreateEngine::Finalize()
+void MyEngine::Release()
 {
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < kMaxTriangle; i++)
 	{
-		triangle_[i]->Finalize();
+		triangle_[i]->Release();
+		textureResource_->Release();
 	}
 
 	graphicsPipelineState_->Release();
@@ -339,54 +322,109 @@ void CreateEngine::Finalize()
 	rootSignature_->Release();
 	pixelShaderBlob_->Release();
 	vertexShaderBlob_->Release();
-	dxCommon_->Finalize();
+	dxCommon_->Release();
 }
 
-void CreateEngine::Update() {
+void MyEngine::Update()
+{
 	transform_.rotate.y += 0.03f;
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 }
 
-void CreateEngine::Draw() {
-	Vector4 color = *triangle_[0]->materialData_;
-	ImGui::Begin("Triangle");
-	ImGui::ColorPicker4("color", &color.x);
-	ImGui::End();
-	*triangle_[0]->materialData_ = color;
-	for (int i = 0; i < 3; i++) {
-		triangle_[i]->Draw(worldMatrix_);
-	}
+void MyEngine::DrawTriangle(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material)
+{
+	triangleCount_++;
+	triangle_[triangleCount_]->Draw(a, b, c, material, worldMatrix_);
 }
 
-void CreateEngine::VariableInialize() {
+DirectX::ScratchImage MyEngine::LoadTexture(const std::string& filePath)
+{
+	DirectX::ScratchImage mipImages = OpenImage(filePath);
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	textureResource_ = CreateTextureResource(dxCommon_->GetDevice(), metadata);
+	UploadTexturData(textureResource_, mipImages);
 
-	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	//metaDataを基にSRVの設定
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
-	Triangle tri[3] = {};
+	//SRVを作成するDescriptorHeapの場所を決める
+	textureSrvHandleCPU_ = dxCommon_->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+	textureSrvHandleGPU_ = dxCommon_->GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
 
-	tri[0].v1 = { -0.4f,0.5f,0.0f,2.0f };
-	tri[0].v2 = { 0.0f,0.8f,0.0f,2.0f };
-	tri[0].v3 = { 0.4f,0.5f,0.0f,2.0f };
-	tri[0].material = { 1.0f,0.0f,0.0f,1.0f };
+	//先頭はImGuiが使っているのでその次を使う
+	textureSrvHandleCPU_.ptr += dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	textureSrvHandleGPU_.ptr += dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	tri[1].v1 = { -0.8f,-0.9f,0.0f,1.0f };
-	tri[1].v2 = { -0.6f,-0.6f,0.0f,1.0f };
-	tri[1].v3 = { -0.4f,-0.9f,0.0f,1.0f };
-	tri[1].material = { 0.0f,1.0f,0.0f,1.0f };
+	//SRVの作成
+	dxCommon_->GetDevice()->CreateShaderResourceView(textureResource_, &srvDesc, textureSrvHandleCPU_);
 
-	tri[2].v1 = { 0.4f,-0.7f,0.0f,1.0f };
-	tri[2].v2 = { 0.6f,-0.4f,0.0f,1.0f };
-	tri[2].v3 = { 0.8f,-0.8f,0.0f,1.0f };
-	tri[2].material = { 0.0f,0.0f,1.0f,1.0f };
+	return mipImages;
+}
 
-	for (int i = 0; i < 3; i++)
+DirectX::ScratchImage MyEngine::OpenImage(const std::string& filePath)
+{
+	//テクスチャファイルを読んでプログラムで扱えるようにする
+	DirectX::ScratchImage image{};
+	std::wstring filePathW = ConvertString(filePath);
+	HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+	assert(SUCCEEDED(hr));
+
+	//ミップマップの生成
+	DirectX::ScratchImage mipImages{};
+	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
+	assert(SUCCEEDED(hr));
+
+	//ミップマップ付きのデータを返す
+	return mipImages;
+}
+
+ID3D12Resource* MyEngine::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
+{
+	//metadataを基にResourceの設定
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Width = UINT(metadata.width);
+	resourceDesc.Height = UINT(metadata.height);
+	resourceDesc.MipLevels = UINT16(metadata.mipLevels);
+	resourceDesc.DepthOrArraySize = UINT16(metadata.arraySize);
+	resourceDesc.Format = metadata.format;
+	resourceDesc.SampleDesc.Count = 1;
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION(metadata.dimension);
+
+	//利用するHeapの設定
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;
+	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
+	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
+
+	//Resourceの生成
+	ID3D12Resource* resource = nullptr;
+	HRESULT hr = device->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&resource));
+	assert(SUCCEEDED(hr));
+
+	return resource;
+}
+
+void MyEngine::UploadTexturData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages)
+{
+	//Meta情報を取得
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+
+	//全MipMapについて
+	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; ++mipLevel)
 	{
-		triangle_[i] = new CreateTriangle();
-		triangle_[i]->Initialize(dxCommon_,tri[i].v1, tri[i].v2, tri[i].v3, tri[i].material);
+		//MipMapLevelを指定して各Imageを取得
+		const DirectX::Image* img = mipImages.GetImage(mipLevel, 0, 0);
+
+		//Textureに転送
+		HRESULT hr = texture->WriteToSubresource(UINT(mipLevel), nullptr, img->pixels, UINT(img->rowPitch), UINT(img->slicePitch));
+		assert(SUCCEEDED(hr));
 	}
 }
 
-
-
-WinApp* CreateEngine::win_;
-DirectXCommon* CreateEngine::dxCommon_;
+WinApp* MyEngine::winApp_;
+DirectXCommon* MyEngine::dxCommon_;

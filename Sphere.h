@@ -1,21 +1,19 @@
-﻿#pragma once
+#pragma once
 #include "DirectX.h"
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
 #include "Vertex.h"
-#include "Matrix4x4.h"
-#include "String.h"
 #include "Matrix.h"
 
 class MyEngine;
 
-class Triangle
+class Sphere
 {
 public:
 	void Initialize(DirectXCommon* dxCommon, MyEngine* engine);
 
-	void Draw(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material, const Matrix4x4& wvpdata);
+	void Draw(const Vector4& material, const Matrix4x4& wvpdata);
 
 	void Finalize();
 
@@ -27,22 +25,20 @@ private:
 	void TransformMatrix();
 
 private:
+	DirectXCommon* dxCommon_;
 	MyEngine* engine_;
 
-	DirectXCommon* dxCommon_;
-
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+	ID3D12Resource* vertexResource;
 	VertexData* vertexData_;
 
-	Vector4* materialData_;
-
-	ID3D12Resource* vertexResource_;
+	ID3D12Resource* wvpResource_;
+	Matrix4x4* wvpData_;
 
 	ID3D12Resource* materialResource_;
+	Vector4* materialData_;
 
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
-
-	//WVP用のリソース
-	ID3D12Resource* wvpResource_;
-
-	Matrix4x4* wvpData_;
+	const float pi = 3.1415f;
+	uint32_t kSubDivision;
+	uint32_t vertexCount;
 };

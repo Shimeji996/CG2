@@ -1,60 +1,38 @@
 ﻿#pragma once
 #include "DirectX.h"
 #include <dxcapi.h>
+#include "Vector2.h"
 #include "Vector3.h"
-#include"Vector4.h"
+#include "Vector4.h"
+#include "Vertex.h"
 #include "Triangle.h"
 #include "Matrix.h"
-#include "externals/DirectXTex/DirectXTex.h"
 #include "String.h"
-#include "Vertex.h"
-
 #pragma comment(lib,"dxcompiler.lib")
-
 
 class MyEngine
 {
 public:
-	void Initialize();
-
-	void Initialization(WinApp* win, const wchar_t* title, int32_t width, int32_t height);
+	void Initialize(const wchar_t* title, int32_t width, int32_t height);
 
 	void BeginFrame();
 
 	void EndFrame();
 
-	void Release();
+	void Finalize();
 
 	void Update();
 
-public:
+	void SettingTexture(const std::string& filePath);
 
-	void DrawTriangle(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material);
+	DirectXCommon* GetDirectXCommon() { return dxCommon_; }
 
-	void DrawSprite(const Vector4& LeftTop, const Vector4& LeftBottom, const Vector4& RightTop, const Vector4& RightBottom);
-
-	DirectX::ScratchImage LoadTexture(const std::string& filePath);
-
-	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandleGPU() { return textureSrvHandleGPU_; }
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_;
 
 private:
-	static WinApp* winApp_;
+	static WinApp* win_;
 	static	DirectXCommon* dxCommon_;
-
-	Triangle* triangle_[11];
-
-	int triangleCount_;
-
-	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
-
-	const int kMaxTriangle = 5;
-
-	ID3D12Resource* vertexResourceSprite;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
-	VertexData* vertexDataSprite = nullptr;
-
-	ID3D12Resource* transformationMatrixResourceSprite;
-	Matrix4x4* transformationMatrixDataSprite;
 
 	IDxcUtils* dxcUtils_;
 	IDxcCompiler3* dxcCompiler_;
@@ -87,10 +65,9 @@ private:
 	//頂点リソースにデータを書き込む
 	Vector4* vertexData_;
 
-	Transform transform_;
-	Transform transformSprite;
+	ID3D12Resource* textureResource_;
 
-	Matrix4x4 worldMatrix_;
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
 
 	IDxcBlob* CompileShader(
 		//CompileShaderするShaderファイルへのパス
@@ -103,17 +80,6 @@ private:
 		IDxcIncludeHandler* includeHandler
 	);
 
-	ID3D12Resource* textureResource_ = nullptr;
-
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_;
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_;
-
-	DirectX::ScratchImage OpenImage(const std::string& filePath);
-
-	ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata);
-
-	void UploadTexturData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
-
 	void InitializeDxcCompiler();
 	void CreateRootSignature();
 	void CreateInputlayOut();
@@ -122,4 +88,9 @@ private:
 	void InitializePSO();
 	void ViewPort();
 	void ScissorRect();
+	void SettingDepth();
+
+	DirectX::ScratchImage LoadTexture(const std::string& filePath);
+	ID3D12Resource* CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata);
+	void UploadtextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 };

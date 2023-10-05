@@ -17,6 +17,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	engine->LoadTexture("resources/uvChecker.png");
 
+	Vector4 leftTop = { 0.0f,0.0f,0.0f,1.0f };
+	Vector4 leftBottom = { 0.0f,360.0f,0.0f,1.0f };
+	Vector4 rightTop = { 640.0f,0.0f,0.0f,1.0f };
+	Vector4 rightBottom = { 640.0f,360.0f,0.0f,1.0f };
+
 	Vector4 triangleVertexData[3][3];
 	Vector4 material[3] = {
 		{1, 1, 1, 1},
@@ -70,6 +75,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				triangleVertexData[i][0], triangleVertexData[i][1], triangleVertexData[i][2],
 				material[i]);
 		}
+
+		engine->DrawSprite(leftTop, leftBottom, rightTop, rightBottom);
 
 		engine->EndFrame();
 	}

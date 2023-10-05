@@ -1,4 +1,5 @@
 ﻿#include "WinApp.h"
+#include "DirectX.h"
 
 //ウィンドウプロシージャ
 LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)

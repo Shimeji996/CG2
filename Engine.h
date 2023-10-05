@@ -8,6 +8,7 @@
 #include "externals/DirectXTex/DirectXTex.h"
 #include "String.h"
 #include "Vertex.h"
+
 #pragma comment(lib,"dxcompiler.lib")
 
 
@@ -26,7 +27,11 @@ public:
 
 	void Update();
 
+public:
+
 	void DrawTriangle(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material);
+
+	void DrawSprite(const Vector4& LeftTop, const Vector4& LeftBottom, const Vector4& RightTop, const Vector4& RightBottom);
 
 	DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
@@ -40,7 +45,16 @@ private:
 
 	int triangleCount_;
 
+	ID3D12Resource* CreateBufferResource(ID3D12Device* device, size_t sizeInBytes);
+
 	const int kMaxTriangle = 5;
+
+	ID3D12Resource* vertexResourceSprite;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
+	VertexData* vertexDataSprite = nullptr;
+
+	ID3D12Resource* transformationMatrixResourceSprite;
+	Matrix4x4* transformationMatrixDataSprite;
 
 	IDxcUtils* dxcUtils_;
 	IDxcCompiler3* dxcCompiler_;
@@ -74,6 +88,8 @@ private:
 	Vector4* vertexData_;
 
 	Transform transform_;
+	Transform transformSprite;
+
 	Matrix4x4 worldMatrix_;
 
 	IDxcBlob* CompileShader(

@@ -13,7 +13,7 @@ void Sphere::Initialize(DirectXCommon* dxCommon, MyEngine* engine)
 	TransformMatrix();
 }
 
-void Sphere::Draw(const Vector4& material, const Matrix4x4& wvpdata)
+void Sphere::Draw(const Vector4& material, const Matrix4x4& wvpdata, uint32_t index)
 {
 	//経度分割一つ分の角度
 	const float kLonEvery = pi * 2.0f / float(kSubDivision);
@@ -61,7 +61,7 @@ void Sphere::Draw(const Vector4& material, const Matrix4x4& wvpdata)
 			dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 
 			//SRVのDescriptorTableの先頭を設定。2はrootParameter[2]のこと
-			dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, engine_->textureSrvHandleGPU_);
+			dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, engine_->textureSrvHandleGPU_[index]);
 
 			//描画
 			dxCommon_->GetCommandList()->DrawInstanced(vertexCount, 1, 0, 0);
@@ -79,6 +79,7 @@ void Sphere::Finalize()
 void Sphere::SettingVertex()
 {
 	vertexResource = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(VertexData) * vertexCount);
+
 	//リソースの先頭のアドレスから使う
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 

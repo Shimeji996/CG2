@@ -35,7 +35,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	}
 
 	//解放処理
-	//gameScene->Finalize();
+	gameScene->Finalize();
 
 	engine->Finalize();
 

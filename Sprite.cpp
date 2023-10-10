@@ -1,4 +1,4 @@
-#include "Sprite.h"
+ï»¿#include "Sprite.h"
 
 void Sprite::Initialize(DirectXCommon* dxCommon, MyEngine* engine)
 {
@@ -11,7 +11,7 @@ void Sprite::Initialize(DirectXCommon* dxCommon, MyEngine* engine)
 
 void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform, const Vector4& material, uint32_t index)
 {
-	//À•W‚Ìİ’è
+	//åº§æ¨™ã®è¨­å®š
 	vertexData_[0].position = { a.num[0],b.num[1],0.0f,1.0f };
 	vertexData_[1].position = { a.num[0],a.num[1],0.0f,1.0f };
 	vertexData_[2].position = { b.num[0],b.num[1],0.0f,1.0f };
@@ -19,7 +19,7 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 	vertexData_[4].position = { b.num[0],a.num[1],0.0f,1.0f };
 	vertexData_[5].position = { b.num[0],b.num[1],0.0f,1.0f };
 
-	//Texcoord‚Ìİ’è
+	//Texcoordã®è¨­å®š
 	vertexData_[0].texcoord = { 0.0f,1.0f };
 	vertexData_[1].texcoord = { 0.0f,0.0f };
 	vertexData_[2].texcoord = { 1.0f,1.0f };
@@ -29,14 +29,14 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 
 	*materialData_ = material;
 
-	//Sprite—p‚ÌworldViewProjectionMatrix‚ğì‚é
+	//Spriteç”¨ã®worldViewProjectionMatrixã‚’ä½œã‚‹
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 viewMatrix = MakeIdentity4x4();
 	Matrix4x4 projectionmatrix = MakeOrthographicMatrix(0.0f, 0.0f, (float)dxCommon_->GetWin()->kClientWidth, (float)dxCommon_->GetWin()->kClientHeight, 0.0f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionmatrix));
 	*transformationMatrixdata_ = worldViewProjectionMatrix;
 
-	//•`‰æ
+	//æç”»
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -56,16 +56,16 @@ void Sprite::Finalize()
 
 void Sprite::SettingVartex()
 {
-	//Sprite—p‚ÌƒŠƒ\[ƒX‚ğì‚é
+	//Spriteç”¨ã®ãƒªã‚½ãƒ¼ã‚¹ã‚’ä½œã‚‹
 	vertexResourceSprite_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(VertexData) * 6);
 
-	//’¸“_ƒoƒbƒtƒ@[ƒrƒ…[‚ğì¬‚µAæ“ª‚ÌƒAƒhƒŒƒX‚©‚çg‚¤
+	//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãƒ¼ãƒ“ãƒ¥ãƒ¼ã‚’ä½œæˆã—ã€å…ˆé ­ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‹ã‚‰ä½¿ã†
 	vertexBufferView_.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
 
-	//g—p‚·‚éƒŠƒ\[ƒXƒTƒCƒY‚Í’¸“_6‚Â•ª
+	//ä½¿ç”¨ã™ã‚‹ãƒªã‚½ãƒ¼ã‚¹ã‚µã‚¤ã‚ºã¯é ‚ç‚¹6ã¤åˆ†
 	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 6;
 
-	//1’¸“_“–‚½‚è‚ÌƒTƒCƒY
+	//1é ‚ç‚¹å½“ãŸã‚Šã®ã‚µã‚¤ã‚º
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
 	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
@@ -73,14 +73,14 @@ void Sprite::SettingVartex()
 
 void Sprite::TransformMatrix()
 {
-	//Sprite—p‚ÌTransformationMatrix—p‚ÌƒŠƒ\[ƒX‚ğì‚é Matrix4x41‚Â•ª‚ğ—pˆÓ‚·‚é
+	//Spriteç”¨ã®TransformationMatrixç”¨ã®ãƒªã‚½ãƒ¼ã‚¹ã‚’ä½œã‚‹ Matrix4x41ã¤åˆ†ã‚’ç”¨æ„ã™ã‚‹
 	transformationMatrixResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(Matrix4x4));
-	transformationMatrixdata_ = nullptr;//‘‚«‚Ş
+	transformationMatrixdata_ = nullptr;//æ›¸ãè¾¼ã‚€
 
-	//‘‚«‚ŞƒAƒhƒŒƒX‚ğæ“¾
+	//æ›¸ãè¾¼ã‚€ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—
 	transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixdata_));
 
-	//’PˆÊs—ñ‚ğ‘‚«‚ñ‚Å‚¨‚­
+	//å˜ä½è¡Œåˆ—ã‚’æ›¸ãè¾¼ã‚“ã§ãŠã
 	*transformationMatrixdata_ = MakeIdentity4x4();
 }
 

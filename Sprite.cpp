@@ -1,4 +1,4 @@
-#include "Sprite.h"
+Ôªø#include "Sprite.h"
 
 void Sprite::Initialize(DirectXCommon* dxCommon, MyEngine* engine)
 {
@@ -6,12 +6,12 @@ void Sprite::Initialize(DirectXCommon* dxCommon, MyEngine* engine)
 	engine_ = engine;
 	SettingVartex();
 	SettingColor();
+	SettingDictionalLight();
 	TransformMatrix();
 }
 
-void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform, const Vector4& material)
-{
-	//ç¿ïWÇÃê›íË
+void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform, const Vector4& material, uint32_t index, const DirectionalLight& light) {
+	//Â∫ßÊ®ô„ÅÆË®≠ÂÆö
 	vertexData_[0].position = { a.num[0],b.num[1],0.0f,1.0f };
 	vertexData_[1].position = { a.num[0],a.num[1],0.0f,1.0f };
 	vertexData_[2].position = { b.num[0],b.num[1],0.0f,1.0f };
@@ -19,7 +19,7 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 	vertexData_[4].position = { b.num[0],a.num[1],0.0f,1.0f };
 	vertexData_[5].position = { b.num[0],b.num[1],0.0f,1.0f };
 
-	//TexcoordÇÃê›íË
+	//Texcoord„ÅÆË®≠ÂÆö
 	vertexData_[0].texcoord = { 0.0f,1.0f };
 	vertexData_[1].texcoord = { 0.0f,0.0f };
 	vertexData_[2].texcoord = { 1.0f,1.0f };
@@ -27,18 +27,29 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 	vertexData_[4].texcoord = { 1.0f,0.0f };
 	vertexData_[5].texcoord = { 1.0f,1.0f };
 
-	*materialData_ = material;
+	for (int i = 0; i < 6; i++) {
+		vertexData_[i].normal = { 0.0f,0.0f,-1.0f };
+	}
 
-	//SpriteópÇÃworldViewProjectionMatrixÇçÏÇÈ
+	*materialData_ = { material,false };
+	*directionalLight_ = light;
+
+	//SpriteÁî®„ÅÆworldViewProjectionMatrix„Çí‰Ωú„Çã
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 viewMatrix = MakeIdentity4x4();
 	Matrix4x4 projectionmatrix = MakeOrthographicMatrix(0.0f, 0.0f, (float)dxCommon_->GetWin()->kClientWidth, (float)dxCommon_->GetWin()->kClientHeight, 0.0f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionmatrix));
-	*transformationMatrixdata_ = worldViewProjectionMatrix;
+	*transformationMatrixdata_ = { worldViewProjectionMatrix,worldMatrix };
 
-	//SpriteÇÃï`âÊ
+	//ÊèèÁîª
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, engine_->textureSrvHandleGPU_[index]);
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+
 	dxCommon_->GetCommandList()->DrawInstanced(6, 1, 0, 0);
 }
 
@@ -46,20 +57,22 @@ void Sprite::Finalize()
 {
 	vertexResourceSprite_->Release();
 	materialResource_->Release();
+	directionalLightResource_->Release();
 	transformationMatrixResource_->Release();
 }
 
-void Sprite::SettingVartex() {
-	//SpriteópÇÃÉäÉ\Å[ÉXÇçÏÇÈ
+void Sprite::SettingVartex()
+{
+	//SpriteÁî®„ÅÆ„É™„ÇΩ„Éº„Çπ„Çí‰Ωú„Çã
 	vertexResourceSprite_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(VertexData) * 6);
 
-	//í∏ì_ÉoÉbÉtÉ@Å[ÉrÉÖÅ[ÇçÏê¨ÇµÅAêÊì™ÇÃÉAÉhÉåÉXÇ©ÇÁégÇ§
+	//È†ÇÁÇπ„Éê„ÉÉ„Éï„Ç°„Éº„Éì„É•„Éº„Çí‰ΩúÊàê„Åó„ÄÅÂÖàÈ†≠„ÅÆ„Ç¢„Éâ„É¨„Çπ„Åã„Çâ‰Ωø„ÅÜ
 	vertexBufferView_.BufferLocation = vertexResourceSprite_->GetGPUVirtualAddress();
 
-	//égópÇ∑ÇÈÉäÉ\Å[ÉXÉTÉCÉYÇÕí∏ì_6Ç¬ï™
+	//‰ΩøÁî®„Åô„Çã„É™„ÇΩ„Éº„Çπ„Çµ„Ç§„Ç∫„ÅØÈ†ÇÁÇπ6„Å§ÂàÜ
 	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 6;
 
-	//1í∏ì_ìñÇΩÇËÇÃÉTÉCÉY
+	//1È†ÇÁÇπÂΩì„Åü„Çä„ÅÆ„Çµ„Ç§„Ç∫
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
 	vertexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
@@ -67,15 +80,15 @@ void Sprite::SettingVartex() {
 
 void Sprite::TransformMatrix()
 {
-	//SpriteópÇÃTransformationMatrixópÇÃÉäÉ\Å[ÉXÇçÏÇÈ Matrix4x41Ç¬ï™Çópà”Ç∑ÇÈ
-	transformationMatrixResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(Matrix4x4));
-	transformationMatrixdata_ = nullptr;//èëÇ´çûÇﬁ
+	//SpriteÁî®„ÅÆTransformationMatrixÁî®„ÅÆ„É™„ÇΩ„Éº„Çπ„Çí‰Ωú„Çã Matrix4x41„Å§ÂàÜ„ÇíÁî®ÊÑè„Åô„Çã
+	transformationMatrixResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(TransformationMatrix));
+	transformationMatrixdata_ = nullptr;//Êõ∏„ÅçËæº„ÇÄ
 
-	//èëÇ´çûÇﬁÉAÉhÉåÉXÇéÊìæ
+	//Êõ∏„ÅçËæº„ÇÄ„Ç¢„Éâ„É¨„Çπ„ÇíÂèñÂæó
 	transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixdata_));
 
-	//íPà çsóÒÇèëÇ´çûÇÒÇ≈Ç®Ç≠
-	*transformationMatrixdata_ = MakeIdentity4x4();
+	//Âçò‰ΩçË°åÂàó„ÇíÊõ∏„ÅçËæº„Çì„Åß„Åä„Åè
+	transformationMatrixdata_->WVP = MakeIdentity4x4();
 }
 
 void Sprite::SettingColor()
@@ -83,4 +96,10 @@ void Sprite::SettingColor()
 	materialResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(VertexData));
 
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+}
+
+void Sprite::SettingDictionalLight()
+{
+	directionalLightResource_ = DirectXCommon::CreateBufferResource(dxCommon_->GetDevice(), sizeof(DirectionalLight));
+	directionalLightResource_->Map(0, NULL, reinterpret_cast<void**>(&directionalLight_));
 }

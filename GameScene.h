@@ -8,7 +8,8 @@
 #include "Sprite.h"
 #include "Sphere.h"
 
-class GameScene {
+class GameScene
+{
 public:
 	void Initialize(MyEngine* engine, DirectXCommon* dxCommon);
 
@@ -16,7 +17,7 @@ public:
 
 	void Draw();
 
-	//void Finalize();
+	void Finalize();
 
 private:
 	MyEngine* engine_;
@@ -24,7 +25,7 @@ private:
 
 	Triangle* triangle_[2];
 	TriangleData triangleData_[2];
-	Transform transform_;
+	Transform transform_[2];
 	Matrix4x4 worldMatrix_;
 
 	Sprite* sprite_[2];
@@ -37,4 +38,16 @@ private:
 	Matrix4x4 sphereMatrix_;
 
 	Transform cameraTransform_;
+
+	uint32_t uvResourceNum_;
+	uint32_t monsterBallResourceNum_;
+
+	DirectionalLight directionalLight_;
+
+	bool texture_;
+
+	bool triangleDrawA_;
+	bool triangleDrawB_;
+	int sphereDraw_;
+	int spriteDraw_;
 };

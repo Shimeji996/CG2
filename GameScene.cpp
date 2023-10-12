@@ -24,7 +24,7 @@ void GameScene::Initialize(MyEngine* engine, DirectXCommon* dxCommon)
 	triangleDrawB_ = false;
 
 	spriteData_.LeftTop[0] = { 0.0f,0.0f,0.0f,1.0f };
-	spriteData_.RightDown[0] = { 640.0f,360.0f,0.0f,1.0f };
+	spriteData_.RightDown[0] = { 640.0f,360.0f,0.0f,1.0f }; 
 	spriteData_.LeftTop[1] = { 0.0f,0.0f,0.0f,1.0f };
 	spriteData_.RightDown[1] = { 640.0f,360.0f,0.0f,1.0f };
 	spriteData_.material = { 1.0f,1.0f,1.0f,1.0f };

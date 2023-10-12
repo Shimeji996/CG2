@@ -95,6 +95,7 @@ private:
 	HRESULT hr_;
 
 	ID3D12Resource* depthStencilResource_;
+	ID3D12Resource* indexResourceSprite = CreateBufferResource(device_, sizeof(uint32_t) * 6);
 	ID3D12DescriptorHeap* dsvDescriptorHeap_;
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvhandle_;
 };

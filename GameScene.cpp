@@ -24,7 +24,7 @@ void GameScene::Initialize(MyEngine* engine, DirectXCommon* dxCommon)
 	triangleDrawB_ = false;
 
 	spriteData_.LeftTop[0] = { 0.0f,0.0f,0.0f,1.0f };
-	spriteData_.RightDown[0] = { 640.0f,360.0f,0.0f,1.0f }; 
+	spriteData_.RightDown[0] = { 640.0f,360.0f,0.0f,1.0f };
 	spriteData_.LeftTop[1] = { 0.0f,0.0f,0.0f,1.0f };
 	spriteData_.RightDown[1] = { 640.0f,360.0f,0.0f,1.0f };
 	spriteData_.material = { 1.0f,1.0f,1.0f,1.0f };
@@ -158,6 +158,10 @@ void GameScene::Update()
 		ImGui::Checkbox("ChangeTexture", &texture_);
 		ImGui::DragFloat4("LightColor", directionalLight_.color.num, 1.0f);
 		ImGui::DragFloat3("DirectionLight", directionalLight_.direction.num, 0.1f);
+		ImGui::DragFloat2("UVTranslate", &sphere_->uvTransformSprite.translate.num[0], 0.01f, -10.0f, 10.0f);
+		ImGui::DragFloat2("UVScale", &sphere_->uvTransformSprite.scale.num[0], 0.01f, -10.0f, 10.0f);
+		ImGui::SliderAngle("UVRotate", &sphere_->uvTransformSprite.rotate.num[2]);
+
 		ImGui::TreePop();
 	}
 
@@ -178,6 +182,11 @@ void GameScene::Update()
 		ImGui::DragFloat3("Rotate", spriteTransform_.rotate.num, 0.05f);
 		ImGui::DragFloat3("Scale", spriteTransform_.scale.num, 0.05f);
 		ImGui::ColorEdit4("Color", spriteData_.material.num, 0);
+		for (int i = 0; i < 2; i++) {
+			ImGui::DragFloat2("UVTranslate", &sprite_[i]->uvTransformSprite.translate.num[0], 0.01f, -10.0f, 10.0f);
+			ImGui::DragFloat2("UVScale", &sprite_[i]->uvTransformSprite.scale.num[0], 0.01f, -10.0f, 10.0f);
+			ImGui::SliderAngle("UVRotate", &sprite_[i]->uvTransformSprite.rotate.num[2]);
+		}
 		ImGui::TreePop();
 	}
 

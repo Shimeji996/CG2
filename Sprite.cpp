@@ -12,7 +12,6 @@ void Sprite::Initialize(DirectXCommon* dxCommon, MyEngine* engine)
 }
 
 void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform, const Vector4& material, uint32_t index, const DirectionalLight& light) {
-	
 	int SpriteIndex = kMaxSpriteVertex + 1;
 
 	for (int i = 0; i < kMaxSprite; ++i) {
@@ -30,7 +29,7 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 		//MaxSpriteより多い
 		assert(false);
 	}
-	
+
 	//座標の設定
 	vertexData_[0].position = { a.num[0],b.num[1],0.0f,1.0f };
 	vertexData_[1].position = { a.num[0],a.num[1],0.0f,1.0f };
@@ -67,6 +66,11 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 	Matrix4x4 projectionmatrix = MakeOrthographicMatrix(0.0f, 0.0f, (float)dxCommon_->GetWin()->kClientWidth, (float)dxCommon_->GetWin()->kClientHeight, 0.0f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionmatrix));
 	*transformationMatrixdata_ = { worldViewProjectionMatrix,worldMatrix };
+
+	uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZmatrix(uvTransformSprite.rotate.num[2]));
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
+	materialData_->uvTransform = uvTransformMatrix;
 
 	//描画
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
@@ -125,6 +129,8 @@ void Sprite::SettingColor()
 	materialResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(VertexData));
 
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+
+	materialData_->uvTransform = MakeIdentity4x4();
 }
 
 void Sprite::SettingDictionalLight()

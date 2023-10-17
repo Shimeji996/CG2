@@ -17,6 +17,12 @@ public:
 
 	void Finalize();
 
+	Transform uvTransformSprite{
+		{1.0f,1.0f,1.0f},
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f}
+	};
+
 private:
 	void SettingVertex();
 
@@ -46,4 +52,6 @@ private:
 
 	DirectionalLight* directionalLight_;
 	ID3D12Resource* directionalLightResource_;
+
+	Matrix4x4 uvTransformMatrix;
 };

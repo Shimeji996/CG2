@@ -22,6 +22,8 @@ private:
 
 	void SettingDictionalLight();
 
+	void SettingIndex();
+
 	void SettingColor();
 
 private:
@@ -40,4 +42,15 @@ private:
 
 	DirectionalLight* directionalLight_;
 	ID3D12Resource* directionalLightResource_;
+
+	ID3D12Resource* indexResourceSprite_;
+
+	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
+
+	uint32_t* indexDataSprite = nullptr;
+
+	static const int kMaxSprite = 3;
+	static const int kMaxSpriteVertex = kMaxSprite * 6;
+
+	bool IsusedSpriteIndex[kMaxSprite];
 };

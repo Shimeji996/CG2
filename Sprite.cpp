@@ -7,10 +7,30 @@ void Sprite::Initialize(DirectXCommon* dxCommon, MyEngine* engine)
 	SettingVartex();
 	SettingColor();
 	SettingDictionalLight();
+	SettingIndex();
 	TransformMatrix();
 }
 
 void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform, const Vector4& material, uint32_t index, const DirectionalLight& light) {
+	
+	int SpriteIndex = kMaxSpriteVertex + 1;
+
+	for (int i = 0; i < kMaxSprite; ++i) {
+		if (IsusedSpriteIndex[i] == false) {
+			SpriteIndex = (i * 6);
+			IsusedSpriteIndex[i] = true;
+			break;
+		}
+	}
+	if (SpriteIndex < 0) {
+		//0より少ない
+		assert(false);
+	}
+	if (kMaxSpriteVertex < SpriteIndex) {
+		//MaxSpriteより多い
+		assert(false);
+	}
+	
 	//座標の設定
 	vertexData_[0].position = { a.num[0],b.num[1],0.0f,1.0f };
 	vertexData_[1].position = { a.num[0],a.num[1],0.0f,1.0f };
@@ -26,6 +46,13 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 	vertexData_[3].texcoord = { 0.0f,0.0f };
 	vertexData_[4].texcoord = { 1.0f,0.0f };
 	vertexData_[5].texcoord = { 1.0f,1.0f };
+
+	indexDataSprite[SpriteIndex] = 0;
+	indexDataSprite[SpriteIndex + 1] = 1;
+	indexDataSprite[SpriteIndex + 2] = 2;
+	indexDataSprite[SpriteIndex + 3] = 1;
+	indexDataSprite[SpriteIndex + 4] = 3;
+	indexDataSprite[SpriteIndex + 5] = 2;
 
 	for (int i = 0; i < 6; i++) {
 		vertexData_[i].normal = { 0.0f,0.0f,-1.0f };
@@ -43,6 +70,7 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 
 	//描画
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	dxCommon_->GetCommandList()->IASetIndexBuffer(&indexBufferViewSprite);
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
@@ -51,6 +79,7 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 
 	dxCommon_->GetCommandList()->DrawInstanced(6, 1, 0, 0);
+	dxCommon_->GetCommandList()->DrawIndexedInstanced(SpriteIndex + 6, 1, 0, 0, 0);
 }
 
 void Sprite::Finalize()
@@ -102,4 +131,18 @@ void Sprite::SettingDictionalLight()
 {
 	directionalLightResource_ = DirectXCommon::CreateBufferResource(dxCommon_->GetDevice(), sizeof(DirectionalLight));
 	directionalLightResource_->Map(0, NULL, reinterpret_cast<void**>(&directionalLight_));
+}
+
+void Sprite::SettingIndex() {
+	indexResourceSprite_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(uint32_t) * 6);
+
+	//リソースの先頭のアドレス
+	indexBufferViewSprite.BufferLocation = indexResourceSprite_->GetGPUVirtualAddress();
+
+	indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * kMaxSpriteVertex;
+
+	indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
+
+	indexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
+
 }

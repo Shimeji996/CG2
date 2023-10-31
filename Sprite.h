@@ -37,19 +37,19 @@ private:
 	MyEngine* engine_;
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
-	ID3D12Resource* vertexResourceSprite_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite_;
 	VertexData* vertexData_;
 
-	ID3D12Resource* transformationMatrixResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 	TransformationMatrix* transformationMatrixdata_;
 
-	ID3D12Resource* materialResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Material* materialData_;
 
 	DirectionalLight* directionalLight_;
-	ID3D12Resource* directionalLightResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;
 
-	ID3D12Resource* indexResourceSprite_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSprite_;
 
 	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
 

@@ -62,10 +62,7 @@ void Triangle::Draw(const Vector4& a, const Vector4& b, const Vector4& c, const 
 
 void Triangle::Finalize()
 {
-	materialResource_->Release();
-	vertexResource_->Release();
-	directionalLightResource_->Release();
-	wvpResource_->Release();
+	
 }
 
 void Triangle::SettingVertex()

@@ -54,10 +54,10 @@ void Sphere::Draw(const Vector4& material, const Transform& transform, uint32_t 
 
 void Sphere::Finalize()
 {
-	vertexResource->Release();
-	materialResource_->Release();
-	directionalLightResource_->Release();
-	wvpResource_->Release();
+	//	vertexResource->Release();
+	//	materialResource_->Release();
+	//	directionalLightResource_->Release();
+	//	wvpResource_->Release();
 }
 
 void Sphere::SettingVertex()

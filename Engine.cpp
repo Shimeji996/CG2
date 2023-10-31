@@ -201,7 +201,7 @@ void MyEngine::RasterizerState()
 void MyEngine::InitializePSO()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	graphicsPipelineStateDesc.pRootSignature = rootSignature_;//RootSignature
+	graphicsPipelineStateDesc.pRootSignature = rootSignature_.Get();//RootSignature
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc_;//Inputlayout
 	graphicsPipelineStateDesc.VS = { vertexShaderBlob_->GetBufferPointer(),
 		vertexShaderBlob_->GetBufferSize() };//vertexShader
@@ -299,10 +299,10 @@ void MyEngine::BeginFrame()
 	dxCommon_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);
 
 	//RootSignatureを設定。PS0とは別途設定が必要
-	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_);
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
 
 	//PS0を設定
-	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_);
+	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
 
 	//開発用UIの処理
 	ImGui::ShowDemoWindow();
@@ -318,7 +318,7 @@ void MyEngine::EndFrame()
 
 void MyEngine::Finalize()
 {
-	for (int i = 0; i < 2; i++)
+	/*for (int i = 0; i < 2; i++)
 	{
 		textureResource_[i]->Release();
 		intermediateResource_[i]->Release();
@@ -334,8 +334,9 @@ void MyEngine::Finalize()
 
 	rootSignature_->Release();
 	pixelShaderBlob_->Release();
-	vertexShaderBlob_->Release();
+	vertexShaderBlob_->Release();*/
 	dxCommon_->Finalize();
+	delete dxCommon_;
 }
 
 void MyEngine::Update() {}
@@ -357,7 +358,7 @@ DirectX::ScratchImage MyEngine::LoadTexture(const std::string& filePath)
 	return mipImages;
 }
 
-ID3D12Resource* MyEngine::CreateTextureResource(ID3D12Device* device, const DirectX::TexMetadata& metadata)
+Microsoft::WRL::ComPtr<ID3D12Resource> MyEngine::CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata)
 {
 	//metadataをもとにResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
@@ -376,7 +377,7 @@ ID3D12Resource* MyEngine::CreateTextureResource(ID3D12Device* device, const Dire
 	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;//プロセッサの近くに配置
 
 	//Resourceを生成する
-	ID3D12Resource* resource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
 	HRESULT hr = device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAG_NONE,
@@ -392,18 +393,18 @@ ID3D12Resource* MyEngine::CreateTextureResource(ID3D12Device* device, const Dire
 
 
 [[nodiscard]]
-ID3D12Resource* MyEngine::UploadtextureData(ID3D12Resource* texture, const DirectX::ScratchImage& mipImages, uint32_t index)
+Microsoft::WRL::ComPtr<ID3D12Resource> MyEngine::UploadtextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages, uint32_t index)
 {
 	std::vector<D3D12_SUBRESOURCE_DATA>subresource;
-	DirectX::PrepareUpload(dxCommon_->GetDevice(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresource);
-	uint64_t  intermediateSize = GetRequiredIntermediateSize(texture, 0, UINT(subresource.size()));
+	DirectX::PrepareUpload(dxCommon_->GetDevice().Get(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresource);
+	uint64_t  intermediateSize = GetRequiredIntermediateSize(texture.Get(), 0, UINT(subresource.size()));
 	intermediateResource_[index] = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), intermediateSize);
-	UpdateSubresources(dxCommon_->GetCommandList(), texture, intermediateResource_[index], 0, 0, UINT(subresource.size()), subresource.data());
+	UpdateSubresources(dxCommon_->GetCommandList().Get(), texture.Get(), intermediateResource_[index].Get(), 0, 0, UINT(subresource.size()), subresource.data());
 
 	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = texture;
+	barrier.Transition.pResource = texture.Get();
 	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
@@ -417,7 +418,7 @@ void MyEngine::SettingTexture(const std::string& filePath, uint32_t index)
 	DirectX::ScratchImage mipImage = LoadTexture(filePath);
 	const DirectX::TexMetadata& metadata = mipImage.GetMetadata();
 	textureResource_[index] = CreateTextureResource(dxCommon_->GetDevice(), metadata);
-	intermediateResource_[index] = UploadtextureData(textureResource_[index], mipImage, index);
+	intermediateResource_[index] = UploadtextureData(textureResource_[index].Get(), mipImage, index);
 
 	//metaDataを基にSRVの設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -435,7 +436,7 @@ void MyEngine::SettingTexture(const std::string& filePath, uint32_t index)
 	textureSrvHandleGPU_[index].ptr += dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	//SRVの生成
-	dxCommon_->GetDevice()->CreateShaderResourceView(textureResource_[index], &srvDesc, textureSrvHandleCPU_[index]);
+	dxCommon_->GetDevice()->CreateShaderResourceView(textureResource_[index].Get(), &srvDesc, textureSrvHandleCPU_[index]);
 }
 
 void MyEngine::SettingObjTexture(uint32_t index) {
@@ -443,7 +444,7 @@ void MyEngine::SettingObjTexture(uint32_t index) {
 	DirectX::ScratchImage mipImages2 = LoadTexture(modelData.material.textureFilePath);
 	const DirectX::TexMetadata& metadata = mipImages2.GetMetadata();
 	textureResource_[index] = CreateTextureResource(dxCommon_->GetDevice(), metadata);
-	intermediateResource_[index] = UploadtextureData(textureResource_[index], mipImages2, index);
+	intermediateResource_[index] = UploadtextureData(textureResource_[index].Get(), mipImages2, index);
 
 	//metaDataを基にSRVの設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -461,17 +462,17 @@ void MyEngine::SettingObjTexture(uint32_t index) {
 	textureSrvHandleGPU_[index].ptr += dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	//SRVの生成
-	dxCommon_->GetDevice()->CreateShaderResourceView(textureResource_[index], &srvDesc, textureSrvHandleCPU_[index]);
+	dxCommon_->GetDevice()->CreateShaderResourceView(textureResource_[index].Get(), &srvDesc, textureSrvHandleCPU_[index]);
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE MyEngine::GetCPUDescriptorHandle(ID3D12DescriptorHeap* descriptorheap, uint32_t descriptorSize, uint32_t index)
+D3D12_CPU_DESCRIPTOR_HANDLE MyEngine::GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorheap, uint32_t descriptorSize, uint32_t index)
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorheap->GetCPUDescriptorHandleForHeapStart();
 	handleCPU.ptr += (descriptorSize * index);
 	return handleCPU;
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE MyEngine::GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorheap, uint32_t descriptorSize, uint32_t index)
+D3D12_GPU_DESCRIPTOR_HANDLE MyEngine::GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorheap, uint32_t descriptorSize, uint32_t index)
 {
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorheap->GetGPUDescriptorHandleForHeapStart();
 	handleGPU.ptr += (descriptorSize * index);

@@ -92,7 +92,7 @@ bool WinApp::Procesmessage()
 
 void WinApp::Finalize()
 {
-	debugController_->Release();
+	//debugController_->Release();
 }
 
 WinApp* WinApp::GetInstance()
@@ -104,4 +104,4 @@ WinApp* WinApp::GetInstance()
 
 
 HWND WinApp::hwnd_;
-ID3D12Debug1* WinApp::debugController_;
+Microsoft::WRL::ComPtr<ID3D12Debug1> WinApp::debugController_;

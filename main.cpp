@@ -6,6 +6,10 @@ const wchar_t kWindowTitle[] = { L"CG2_マスダリュウ" };
 //Windowsアプリでのエントリーポイント
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
+	D3DResourceLeakChecker leakCheck;
+	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory;
+	Microsoft::WRL::ComPtr<ID3D12Device> device;
+
 	//COM初期化
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
@@ -38,6 +42,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	gameScene->Finalize();
 
 	engine->Finalize();
+
+	delete engine;
+	delete gameScene;
 
 	CoUninitialize();
 

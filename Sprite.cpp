@@ -21,14 +21,6 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 			break;
 		}
 	}
-	if (SpriteIndex < 0) {
-		//0より少ない
-		assert(false);
-	}
-	if (kMaxSpriteVertex < SpriteIndex) {
-		//MaxSpriteより多い
-		assert(false);
-	}
 
 	//座標の設定
 	vertexData_[0].position = { a.num[0],b.num[1],0.0f,1.0f };
@@ -83,15 +75,15 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 
 	dxCommon_->GetCommandList()->DrawInstanced(6, 1, 0, 0);
-	dxCommon_->GetCommandList()->DrawIndexedInstanced(SpriteIndex + 6, 1, 0, 0, 0);
+	dxCommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 
 void Sprite::Finalize()
 {
-	vertexResourceSprite_->Release();
-	materialResource_->Release();
-	directionalLightResource_->Release();
-	transformationMatrixResource_->Release();
+	//	vertexResourceSprite_->Release();
+	//	materialResource_->Release();
+	//	directionalLightResource_->Release();
+	//	transformationMatrixResource_->Release();
 }
 
 void Sprite::SettingVartex()
@@ -145,7 +137,7 @@ void Sprite::SettingIndex() {
 	//リソースの先頭のアドレス
 	indexBufferViewSprite.BufferLocation = indexResourceSprite_->GetGPUVirtualAddress();
 
-	indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * kMaxSpriteVertex;
+	indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
 
 	indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
 

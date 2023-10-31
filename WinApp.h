@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <cstdint>
 #include <d3d12.h>
+#include <wrl.h>
 
 #pragma comment(lib,"d3d12.lib")
 
@@ -23,7 +24,7 @@ public:
 
 	static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
-	ID3D12Debug1* GetdebugController() { return debugController_; }
+	Microsoft::WRL::ComPtr<ID3D12Debug1> GetdebugController() { return debugController_; }
 
 	inline HWND GetHwnd() { return hwnd_; }
 
@@ -38,7 +39,7 @@ public:
 private:
 	UINT windowStyle_;
 
-	static ID3D12Debug1* debugController_;
+	static Microsoft::WRL::ComPtr<ID3D12Debug1> debugController_;
 
 	static inline WNDCLASS wc_{};//ウィンドウクラス
 

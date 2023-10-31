@@ -54,4 +54,6 @@ private:
 	ID3D12Resource* directionalLightResource_;
 
 	Matrix4x4 uvTransformMatrix;
+
+	ModelData modelData;
 };

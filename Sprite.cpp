@@ -126,7 +126,7 @@ void Sprite::TransformMatrix()
 
 void Sprite::SettingColor()
 {
-	materialResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(VertexData));
+	materialResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(Material));
 
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 

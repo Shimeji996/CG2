@@ -88,7 +88,7 @@ void Triangle::SettingVertex()
 void Triangle::SettingColor()
 {
 	//マテリアル用のリソースを作る　今回はcolor1つ分
-	materialResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(VertexData));
+	materialResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(Material));
 
 	//書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));

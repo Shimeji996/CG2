@@ -27,6 +27,12 @@ public:
 
 	void SettingTexture(const std::string& filePath, uint32_t index);
 
+	void SettingObjTexture(uint32_t index);
+
+	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
+
+	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
+
 	DirectXCommon* GetDirectXCommon() { return dxCommon_; }
 
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_[2];
@@ -74,6 +80,7 @@ private:
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
 
 	ID3D12Resource* intermediateResource_[2];
+	ID3D12Resource* intermediateResources_[2];
 	uint32_t descriptorSizeSRV;
 	uint32_t descriptorSizeRTV;
 	uint32_t descriptorSizeDSV;

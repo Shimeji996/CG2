@@ -1,5 +1,7 @@
 ﻿#include "Engine.h"
 #include <assert.h>
+#include <fstream>
+#include <sstream>
 
 IDxcBlob* MyEngine::CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler) {
 	//これからシェーダーをコンパイルする旨をログに出す
@@ -411,10 +413,37 @@ ID3D12Resource* MyEngine::UploadtextureData(ID3D12Resource* texture, const Direc
 
 void MyEngine::SettingTexture(const std::string& filePath, uint32_t index)
 {
+	ModelData modelData;
 	DirectX::ScratchImage mipImage = LoadTexture(filePath);
 	const DirectX::TexMetadata& metadata = mipImage.GetMetadata();
 	textureResource_[index] = CreateTextureResource(dxCommon_->GetDevice(), metadata);
 	intermediateResource_[index] = UploadtextureData(textureResource_[index], mipImage, index);
+
+	//metaDataを基にSRVの設定
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
+	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+
+	//SRVを作成するDescripterHeapの場所を決める
+	textureSrvHandleGPU_[index] = GetGPUDescriptorHandle(dxCommon_->GetSrvDescriptiorHeap(), descriptorSizeSRV, index);
+	textureSrvHandleCPU_[index] = GetCPUDescriptorHandle(dxCommon_->GetSrvDescriptiorHeap(), descriptorSizeSRV, index);
+
+	//先頭はIMGUIが使ってるので、その次を使う
+	textureSrvHandleCPU_[index].ptr += dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	textureSrvHandleGPU_[index].ptr += dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	//SRVの生成
+	dxCommon_->GetDevice()->CreateShaderResourceView(textureResource_[index], &srvDesc, textureSrvHandleCPU_[index]);
+}
+
+void MyEngine::SettingObjTexture(uint32_t index) {
+	ModelData modelData;
+	DirectX::ScratchImage mipImages2 = LoadTexture(modelData.material.textureFilePath);
+	const DirectX::TexMetadata& metadata = mipImages2.GetMetadata();
+	textureResource_[index] = CreateTextureResource(dxCommon_->GetDevice(), metadata);
+	intermediateResource_[index] = UploadtextureData(textureResource_[index], mipImages2, index);
 
 	//metaDataを基にSRVの設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -447,6 +476,102 @@ D3D12_GPU_DESCRIPTOR_HANDLE MyEngine::GetGPUDescriptorHandle(ID3D12DescriptorHea
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorheap->GetGPUDescriptorHandleForHeapStart();
 	handleGPU.ptr += (descriptorSize * index);
 	return handleGPU;
+}
+
+ModelData MyEngine::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
+
+	ModelData modelData;//構築するModelData
+	std::vector<Vector4> positions;//位置
+	std::vector<Vector3> normals;//法線
+	std::vector<Vector2> texcoords;//テクスチャ座標
+	std::string line;
+
+	std::ifstream file(directoryPath + "/" + filename);
+	assert(file.is_open());
+
+	while (std::getline(file, line)) {
+		std::string identifier;
+		std::istringstream s(line);
+		s >> identifier;//先頭の識別子を読む
+
+		if (identifier == "v") {
+			Vector4 position;
+			s >> position.num[0] >> position.num[1] >> position.num[2];
+			position.num[0] *= -1.0f;
+			position.num[3] = 1.0f;
+			positions.push_back(position);
+		}
+		else if (identifier == "vt") {
+			Vector2 texcoord;
+			s >> texcoord.num[0] >> texcoord.num[1];
+			texcoord.num[1] = 1.0f - texcoord.num[1];
+			texcoords.push_back(texcoord);
+		}
+		else if (identifier == "vn") {
+			Vector3 normal;
+			s >> normal.num[0] >> normal.num[1] >> normal.num[2];
+			normal.num[0] *= -1.0f;
+			normals.push_back(normal);
+		}
+		else if (identifier == "f") {
+			VertexData triangle[3];
+			//面は三角形限定,その他は未対応
+			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
+				std::string vertexDefinition;
+				s >> vertexDefinition;
+
+				std::istringstream v(vertexDefinition);
+				uint32_t elementIndices[3];
+				for (int32_t element = 0; element < 3; ++element) {
+					std::string index;
+					std::getline(v, index, '/');
+					elementIndices[element] = std::stoi(index);
+				}
+				Vector4 position = positions[elementIndices[0] - 1];
+				Vector2 texcoord = texcoords[elementIndices[1] - 1];
+				Vector3 normal = normals[elementIndices[2] - 1];
+				//VertexData vertex = { position,texcoord,normal };
+				triangle[faceVertex] = { position,texcoord,normal };
+			}
+			modelData.vertices.push_back(triangle[2]);
+			modelData.vertices.push_back(triangle[1]);
+			modelData.vertices.push_back(triangle[0]);
+		}
+
+	}
+	return modelData;
+}
+
+MaterialData MyEngine::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename) {
+
+	ModelData modelData;//構築するmodelData
+	MaterialData materialData;//構築するMaterialData
+	std::string line;//ファイルから読んだ一桁を格納するもの
+	std::ifstream file(directoryPath + "/" + filename);//ファイルを開く
+	assert(file.is_open());
+
+	while (std::getline(file, line)) {
+		std::string identifier;
+		std::istringstream s(line);
+		s >> identifier;
+
+		//identifierに応じた処理
+		if (identifier == "map_kd") {
+			std::string textureFilename;
+			s >> textureFilename;
+			//連結にしてファイルパスにする
+			materialData.textureFilePath = directoryPath + "/" + textureFilename;
+		}
+		else if (identifier == "mtllib") {
+			//materialTemplateLibraryファイルの名前を取得
+			std::string materialFilename;
+			s >> materialFilename;
+			//基本的にOBJファイルと同一階層にmtlは存在させるので、ディレクトリ名とファイル名を渡す
+			modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
+		}
+
+	}
+	return materialData;
 }
 
 DirectXCommon* MyEngine::dxCommon_;

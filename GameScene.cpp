@@ -138,9 +138,9 @@ void GameScene::Update()
 		}
 		ImGui::TreePop();
 	}
-	if (ImGui::TreeNode("obj"))
+	if (ImGui::TreeNode("sphere"))
 	{
-		if (ImGui::Button("obj"))
+		if (ImGui::Button("sphere"))
 		{
 			if (sphereDraw_ == false)
 			{

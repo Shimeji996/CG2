@@ -7,6 +7,8 @@
 #include "Triangle.h"
 #include "Sprite.h"
 #include "Sphere.h"
+#include "Input.h"
+#include "Matrix.h"
 
 class GameScene
 {
@@ -22,6 +24,11 @@ public:
 private:
 	MyEngine* engine_;
 	DirectXCommon* dxCommon_;
+	Input* input_;
+
+	Vector3 axis;
+	float angle;
+	Matrix4x4 rotateMatrix;
 
 	Triangle* triangle_[2];
 	TriangleData triangleData_[2];

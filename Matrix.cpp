@@ -454,3 +454,30 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 	result.m[3][3] = 1;
 	return result;
 }
+
+Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle)
+{
+	Matrix4x4 result;
+
+	result.m[0][0] = (axis.num[0] * axis.num[0]) * (1 - cos(angle)) + cos(angle);
+	result.m[0][1] = (axis.num[0] * axis.num[1]) * (1 - cos(angle)) + axis.num[2] * sin(angle);
+	result.m[0][2] = (axis.num[0] * axis.num[2]) * (1 - cos(angle)) - axis.num[1] * sin(angle);
+	result.m[0][3] = 0;
+
+	result.m[1][0] = (axis.num[0] * axis.num[1]) * (1 - cos(angle)) - axis.num[2] * sin(angle);
+	result.m[1][1] = (axis.num[1] * axis.num[1]) * (1 - cos(angle)) + cos(angle);
+	result.m[1][2] = (axis.num[1] * axis.num[2]) * (1 - cos(angle)) + axis.num[0] * sin(angle);
+	result.m[1][3] = 0;
+
+	result.m[2][0] = (axis.num[0] * axis.num[2]) * (1 - cos(angle)) + axis.num[1] * sin(angle);
+	result.m[2][1] = (axis.num[1] * axis.num[2]) * (1 - cos(angle)) - axis.num[0] * sin(angle);
+	result.m[2][2] = (axis.num[2] * axis.num[2]) * (1 - cos(angle)) + cos(angle);
+	result.m[2][3] = 0;
+
+	result.m[3][0] = 0;
+	result.m[3][1] = 0;
+	result.m[3][2] = 0;
+	result.m[3][3] = 1;
+
+	return result;
+}

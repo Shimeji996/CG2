@@ -5,6 +5,13 @@ void GameScene::Initialize(MyEngine* engine, DirectXCommon* dxCommon)
 	engine_ = engine;
 	dxCommon_ = dxCommon;
 
+	input_ = Input::GetInstance();
+	input_->Initialize();
+
+	axis = Normalise({ 1.0f,1.0f,1.0f });
+	angle = 0.44f;
+	rotateMatrix = MakeRotateAxisAngle(axis, angle);
+
 	triangleData_[0].position[0] = { -0.5f,-0.5f,0.0f,1.0f };
 	triangleData_[0].position[1] = { 0.0f,0.5f,0.0f,1.0f };
 	triangleData_[0].position[2] = { 0.5f,-0.5f,0.0f,1.0f };
@@ -88,8 +95,16 @@ void GameScene::Update()
 
 	directionalLight_.direction = Normalise(directionalLight_.direction);
 
+	input_->Update();
 
-	ImGui::Begin("OPTION");
+	ImGui::Begin("rotateMatrix");
+	ImGui::InputFloat4("Matrix0", &rotateMatrix.m[0][0]);
+	ImGui::InputFloat4("Matrix1", &rotateMatrix.m[1][0]);
+	ImGui::InputFloat4("Matrix2", &rotateMatrix.m[2][0]);
+	ImGui::InputFloat4("Matrix3", &rotateMatrix.m[3][0]);
+	ImGui::End();
+
+	/*ImGui::Begin("OPTION");
 	if (ImGui::TreeNode("Triangle"))
 	{
 		if (ImGui::Button("TriangleA"))
@@ -197,7 +212,7 @@ void GameScene::Update()
 		ImGui::DragFloat3("Scale", cameraTransform_.scale.num, 0.05f);
 		ImGui::TreePop();
 	}
-	ImGui::End();
+	ImGui::End();*/
 }
 
 void GameScene::Draw()

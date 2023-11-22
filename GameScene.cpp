@@ -8,9 +8,17 @@ void GameScene::Initialize(MyEngine* engine, DirectXCommon* dxCommon)
 	input_ = Input::GetInstance();
 	input_->Initialize();
 
-	axis = Normalise({ 1.0f,1.0f,1.0f });
+	/*axis = Normalise({ 1.0f,1.0f,1.0f });
 	angle = 0.44f;
-	rotateMatrix = MakeRotateAxisAngle(axis, angle);
+	rotateMatrix = MakeRotateAxisAngle(axis, angle);*/
+
+	from0 = Normalise(Vector3{ 1.0f,0.7f,0.5f });
+	to0 = { -from0.num[0],-from0.num[1],-from0.num[2] };
+	from1 = Normalise(Vector3{ -0.6f,0.9f,0.2f });
+	to1 = Normalise(Vector3{ 0.4f,0.7f,-0.5f });
+	rotateMatrix0 = DirectionToDirection(Normalise(Vector3{ 1.0f,0.0f,0.0f }), Normalise(Vector3{ -1.0f,0.0f,0.0f }));
+	rotateMatrix1 = DirectionToDirection(from0, to0);
+	rotateMatrix2 = DirectionToDirection(from1, to1);
 
 	triangleData_[0].position[0] = { -0.5f,-0.5f,0.0f,1.0f };
 	triangleData_[0].position[1] = { 0.0f,0.5f,0.0f,1.0f };
@@ -97,12 +105,35 @@ void GameScene::Update()
 
 	input_->Update();
 
-	ImGui::Begin("rotateMatrix");
+	/*ImGui::Begin("rotateMatrix");
 	ImGui::InputFloat4("Matrix0", &rotateMatrix.m[0][0]);
 	ImGui::InputFloat4("Matrix1", &rotateMatrix.m[1][0]);
 	ImGui::InputFloat4("Matrix2", &rotateMatrix.m[2][0]);
 	ImGui::InputFloat4("Matrix3", &rotateMatrix.m[3][0]);
+	ImGui::End();*/
+
+#ifdef _DEBUG
+	ImGui::Begin("MT4");
+	ImGui::Text("rotateMatrix0");
+	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix0.m[0][0], rotateMatrix0.m[0][1], rotateMatrix0.m[0][2], rotateMatrix0.m[0][3]);
+	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix0.m[1][0], rotateMatrix0.m[1][1], rotateMatrix0.m[1][2], rotateMatrix0.m[1][3]);
+	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix0.m[2][0], rotateMatrix0.m[2][1], rotateMatrix0.m[2][2], rotateMatrix0.m[2][3]);
+	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix0.m[3][0], rotateMatrix0.m[3][1], rotateMatrix0.m[3][2], rotateMatrix0.m[3][3]);
+
+	ImGui::Text("rotateMatrix1");
+	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix1.m[0][0], rotateMatrix1.m[0][1], rotateMatrix1.m[0][2], rotateMatrix1.m[0][3]);
+	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix1.m[1][0], rotateMatrix1.m[1][1], rotateMatrix1.m[1][2], rotateMatrix1.m[1][3]);
+	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix1.m[2][0], rotateMatrix1.m[2][1], rotateMatrix1.m[2][2], rotateMatrix1.m[2][3]);
+	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix1.m[3][0], rotateMatrix1.m[3][1], rotateMatrix1.m[3][2], rotateMatrix1.m[3][3]);
+
+	ImGui::Text("rotateMatrix2");
+	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix2.m[0][0], rotateMatrix2.m[0][1], rotateMatrix2.m[0][2], rotateMatrix2.m[0][3]);
+	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix2.m[1][0], rotateMatrix2.m[1][1], rotateMatrix2.m[1][2], rotateMatrix2.m[1][3]);
+	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix2.m[2][0], rotateMatrix2.m[2][1], rotateMatrix2.m[2][2], rotateMatrix2.m[2][3]);
+	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix2.m[3][0], rotateMatrix2.m[3][1], rotateMatrix2.m[3][2], rotateMatrix2.m[3][3]);
 	ImGui::End();
+#endif
+
 
 	/*ImGui::Begin("OPTION");
 	if (ImGui::TreeNode("Triangle"))

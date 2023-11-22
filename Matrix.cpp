@@ -487,6 +487,46 @@ Vector3 Cross(const Vector3& v1, const Vector3& v2)
 	Vector3 result;
 	result.num[0] = (v1.num[1] * v2.num[2]) - (v1.num[2] * v2.num[1]);
 	result.num[1] = (v1.num[2] * v2.num[0]) - (v1.num[0] * v2.num[2]);
-	result.num[2]
+	result.num[2] = (v1.num[0] * v2.num[1]) - (v1.num[1] * v2.num[0]);
+	return result;
+}
 
+Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to)
+{
+	Matrix4x4 result;
+	Vector3 cross = Cross(from, to);
+	Vector3 n = Normalise(Cross(from, to));
+	// u = -v のとき　つまり反転してしまった時
+	if (from.num[0] == -to.num[0] && from.num[1] == -to.num[1] && from.num[2] == -to.num[2]) {
+		if (from.num[0] != 0.0f || from.num[1] != 0.0f) {
+			n = { from.num[1],-from.num[0],0.0f };
+		}
+		else if (from.num[0] != 0.0f || from.num[2] != 0.0f) {
+			n = { from.num[2],0.0f,-from.num[0] };
+		}
+	}
+
+	float costhata = Dot(from, to);
+	float sinthata = Length(cross);
+	result.m[0][0] = (n.num[0] * n.num[0]) * (1 - costhata) + costhata;
+	result.m[0][1] = (n.num[0] * n.num[1]) * (1 - costhata) + n.num[2] * sinthata;
+	result.m[0][2] = (n.num[0] * n.num[2]) * (1 - costhata) - n.num[1] * sinthata;
+	result.m[0][3] = 0;
+
+	result.m[1][0] = (n.num[0] * n.num[1]) * (1 - costhata) - n.num[2] * sinthata;
+	result.m[1][1] = (n.num[1] * n.num[1]) * (1 - costhata) + costhata;
+	result.m[1][2] = (n.num[1] * n.num[2]) * (1 - costhata) + n.num[0] * sinthata;
+	result.m[1][3] = 0;
+
+	result.m[2][0] = (n.num[0] * n.num[2]) * (1 - costhata) + n.num[1] * sinthata;
+	result.m[2][1] = (n.num[1] * n.num[2]) * (1 - costhata) - n.num[0] * sinthata;
+	result.m[2][2] = (n.num[2] * n.num[2]) * (1 - costhata) + costhata;
+	result.m[2][3] = 0;
+
+	result.m[3][0] = 0;
+	result.m[3][1] = 0;
+	result.m[3][2] = 0;
+	result.m[3][3] = 1;
+
+	return result;
 }

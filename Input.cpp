@@ -1,4 +1,4 @@
-#include "Input.h"
+ï»¿#include "Input.h"
 #include <cassert>
 
 #pragma comment(lib,"xinput.lib")
@@ -13,26 +13,26 @@ void Input::Initialize() {
 
 	HRESULT result;
 
-	//DiretxInput‚ÌƒCƒ“ƒXƒ^ƒ“ƒX¶¬
+	//DiretxInputã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç”Ÿæˆ
 	result = DirectInput8Create(WinApp::GetInstance()->GetWc().hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
 	assert(SUCCEEDED(result));
-	//ƒL[ƒ{[ƒhƒfƒoƒCƒXì¬
+	//ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ãƒ‡ãƒã‚¤ã‚¹ä½œæˆ
 	result = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
 	assert(SUCCEEDED(result));
-	// “ü—Íƒf[ƒ^Œ`Ž®‚ÌƒZƒbƒg
+	// å…¥åŠ›ãƒ‡ãƒ¼ã‚¿å½¢å¼ã®ã‚»ãƒƒãƒˆ
 	result = keyboard->SetDataFormat(&c_dfDIKeyboard);
 	assert(SUCCEEDED(result));
-	// ”r‘¼§ŒäƒŒƒxƒ‹‚ÌƒŠƒZƒbƒg
+	// æŽ’ä»–åˆ¶å¾¡ãƒ¬ãƒ™ãƒ«ã®ãƒªã‚»ãƒƒãƒˆ
 	result = keyboard->SetCooperativeLevel(WinApp::GetInstance()->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(result));
 }
 
 void Input::Update() {
-	// ‘O‰ñ‚ÌƒL[“ü—Í‚ð•Û‘¶
+	// å‰å›žã®ã‚­ãƒ¼å…¥åŠ›ã‚’ä¿å­˜
 	memcpy(preKey, key, sizeof(key));
-	// ƒL[ƒ{[ƒhî•ñ‚ÌŽæ“¾
+	// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰æƒ…å ±ã®å–å¾—
 	keyboard->Acquire();
-	// ‘SƒL[‚Ì“ü—Íî•ñ‚ðŽæ“¾‚·‚é
+	// å…¨ã‚­ãƒ¼ã®å…¥åŠ›æƒ…å ±ã‚’å–å¾—ã™ã‚‹
 	keyboard->GetDeviceState(sizeof(key), key);
 }
 

@@ -482,12 +482,9 @@ Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle)
 	return result;
 }
 
-Vector3 Cross(const Vector3& v1, const Vector3& v2) 
+Vector3 Cross(const Vector3& v1, const Vector3& v2)
 {
-	Vector3 result;
-	result.num[0] = (v1.num[1] * v2.num[2]) - (v1.num[2] * v2.num[1]);
-	result.num[1] = (v1.num[2] * v2.num[0]) - (v1.num[0] * v2.num[2]);
-	result.num[2] = (v1.num[0] * v2.num[1]) - (v1.num[1] * v2.num[0]);
+	Vector3 result = { v1.num[1] * v2.num[2] - v1.num[2] * v2.num[1], v1.num[2] * v2.num[0] - v1.num[0] * v2.num[2], v1.num[0] * v2.num[1] - v1.num[1] * v2.num[0] };
 	return result;
 }
 

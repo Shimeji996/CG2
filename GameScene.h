@@ -9,6 +9,7 @@
 #include "Sphere.h"
 #include "Input.h"
 #include "Matrix.h"
+#include "Quaternion.h"
 
 class GameScene
 {
@@ -37,6 +38,14 @@ private:
 	Matrix4x4 rotateMatrix0;
 	Matrix4x4 rotateMatrix1;
 	Matrix4x4 rotateMatrix2;
+
+	Quaternion identity;
+	Quaternion conj;
+	Quaternion inv;
+	Quaternion normal;
+	Quaternion mul1;
+	Quaternion mul2;
+	float norm;
 
 	Triangle* triangle_[2];
 	TriangleData triangleData_[2];

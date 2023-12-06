@@ -1,4 +1,4 @@
-#include "Object.h"
+ï»¿#include "Object.h"
 #include "Engine.h"
 #include <cmath>
 
@@ -33,21 +33,21 @@ void Object::Draw(const Vector4& material, const Transform& transform, uint32_t 
 	*wvpData_ = { wvpMatrix_,worldMatrix };
 	*directionalLight_ = light;
 
-	//VBV‚ðÝ’è
+	//VBVã‚’è¨­å®š
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
 
-	//Œ`ó‚ðÝ’èBPS0‚ÉÝ’è‚µ‚Ä‚¢‚é‚à‚Ì‚Æ‚Í‚Ü‚½•ÊB“¯‚¶‚à‚Ì‚ðÝ’è‚·‚é
+	//å½¢çŠ¶ã‚’è¨­å®šã€‚PS0ã«è¨­å®šã—ã¦ã„ã‚‹ã‚‚ã®ã¨ã¯ã¾ãŸåˆ¥ã€‚åŒã˜ã‚‚ã®ã‚’è¨­å®šã™ã‚‹
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	//ƒ}ƒeƒŠƒAƒ‹CBuffer‚ÌêŠ‚ðÝ’è
+	//ãƒžãƒ†ãƒªã‚¢ãƒ«CBufferã®å ´æ‰€ã‚’è¨­å®š
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 
-	//SRV‚ÌDescriptorTable‚Ìæ“ª‚ðÝ’èB2‚ÍrootParameter[2]‚Ì‚±‚Æ
+	//SRVã®DescriptorTableã®å…ˆé ­ã‚’è¨­å®šã€‚2ã¯rootParameter[2]ã®ã“ã¨
 	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, engine_->textureSrvHandleGPU_[index]);
 
-	//•`‰æ
+	//æç”»
 	//dxCommon_->GetCommandList()->DrawInstanced(vertexCount, 1, 0, 0);
 	dxCommon_->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 }
@@ -64,7 +64,7 @@ void Object::SettingVertex()
 {
 	//vertexResource = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(VertexData) * vertexCount);
 	vertexResource = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(VertexData) * modelData.vertices.size());
-	//ƒŠƒ\[ƒX‚Ìæ“ª‚ÌƒAƒhƒŒƒX‚©‚çŽg‚¤
+	//ãƒªã‚½ãƒ¼ã‚¹ã®å…ˆé ­ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‹ã‚‰ä½¿ã†
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 
 	//vertexBufferView.SizeInBytes = sizeof(VertexData) * vertexCount;

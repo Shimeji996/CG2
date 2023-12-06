@@ -2,7 +2,7 @@
 #include "Matrix4x4.h"
 #include "Vector3.h"
 #include "Vector4.h"
-#include <assert.h>
+#include <cassert>
 #include <cmath>
 
 struct Transform
@@ -16,7 +16,7 @@ float cot(float theta);
 float Length(const Vector3& v);
 float Dot(const Vector3& v1, const Vector3& v2);
 
-Vector3 Normalise(const Vector3& v);
+Vector3 Normalize(const Vector3& v1);
 
 //X軸回転行列
 Matrix4x4 MakeRotateXmatrix(float radian);
@@ -65,3 +65,5 @@ Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle);
 Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to);
 
 Vector3 Cross(const Vector3& v1, const Vector3& v2);
+
+Vector3 VectorTransform(const Vector3& vector, const Matrix4x4& matrix);

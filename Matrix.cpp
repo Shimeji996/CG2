@@ -1,13 +1,14 @@
 ﻿#include "Matrix.h"
 
-Vector3 Normalise(const Vector3& v)
-{
-	float len = Length(v);
-	if (len != 0)
-	{
-		return { v.num[0] / len,v.num[1] / len,v.num[2] / len };
+Vector3 Normalize(const Vector3& v1) {
+	Vector3 result{};
+	float length = Length(v1);
+	if (length != 0.0f) {
+		result.num[0] = v1.num[0] / length;
+		result.num[1] = v1.num[1] / length;
+		result.num[2] = v1.num[2] / length;
 	}
-	return v;
+	return result;
 }
 
 float Length(const Vector3& v)
@@ -492,7 +493,7 @@ Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to)
 {
 	Matrix4x4 result;
 	Vector3 cross = Cross(from, to);
-	Vector3 n = Normalise(Cross(from, to));
+	Vector3 n = Normalize(Cross(from, to));
 	// u = -v のとき　つまり反転してしまった時
 	if (from.num[0] == -to.num[0] && from.num[1] == -to.num[1] && from.num[2] == -to.num[2]) {
 		if (from.num[0] != 0.0f || from.num[1] != 0.0f) {
@@ -525,5 +526,19 @@ Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to)
 	result.m[3][2] = 0;
 	result.m[3][3] = 1;
 
+	return result;
+}
+
+Vector3 VectorTransform(const Vector3& vector, const Matrix4x4& matrix)
+{
+	Vector3 result;
+	result.num[0] = vector.num[0] * matrix.m[0][0] + vector.num[1] * matrix.m[1][0] + vector.num[2] * matrix.m[2][0] + 1.0f * matrix.m[3][0];
+	result.num[1] = vector.num[0] * matrix.m[0][1] + vector.num[1] * matrix.m[1][1] + vector.num[2] * matrix.m[2][1] + 1.0f * matrix.m[3][1];
+	result.num[2] = vector.num[0] * matrix.m[0][2] + vector.num[1] * matrix.m[1][2] + vector.num[2] * matrix.m[2][2] + 1.0f * matrix.m[3][2];
+	float W = vector.num[0] * matrix.m[0][3] + vector.num[1] * matrix.m[1][3] + vector.num[2] * matrix.m[2][3] + 1.0f * matrix.m[3][3];
+	assert(W != 0.0f);
+	result.num[0] /= W;
+	result.num[1] /= W;
+	result.num[2] /= W;
 	return result;
 }

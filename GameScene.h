@@ -27,25 +27,10 @@ private:
 	DirectXCommon* dxCommon_;
 	Input* input_;
 
-	/*Vector3 axis;
-	float angle;
-	Matrix4x4 rotateMatrix;*/
-
-	Vector3 from0;
-	Vector3 to0;
-	Vector3 from1;
-	Vector3 to1;
-	Matrix4x4 rotateMatrix0;
-	Matrix4x4 rotateMatrix1;
-	Matrix4x4 rotateMatrix2;
-
-	Quaternion identity;
-	Quaternion conj;
-	Quaternion inv;
-	Quaternion normal;
-	Quaternion mul1;
-	Quaternion mul2;
-	float norm;
+	Quaternion rotation;
+	Matrix4x4 rotateMatrix;
+	Vector3 rotateByQuaternion;
+	Vector3 rotateByMatrix;
 
 	Triangle* triangle_[2];
 	TriangleData triangleData_[2];

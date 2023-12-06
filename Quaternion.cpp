@@ -55,3 +55,51 @@ Quaternion Inverse(const Quaternion& quaternion)
 	}
 	return result;
 }
+
+Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle) 
+{
+	Quaternion result;
+	result.num[0] = axis.num[0] * sin(angle / 2);
+	result.num[1] = axis.num[1] * sin(angle / 2);
+	result.num[2] = axis.num[2] * sin(angle / 2);
+	result.num[3] = cos(angle / 2);
+	return result;
+}
+
+Vector3 RotateVector(const Vector3& vector, const Quaternion& quaternion) 
+{
+	Quaternion fromVector = { vector.num[0],vector.num[1],vector.num[2],0.0f };
+	Quaternion conj = Conjugate(quaternion);
+	Quaternion rotate = Multiply(quaternion, Multiply(fromVector, conj));
+	Vector3 result;
+	result.num[0] = rotate.num[0];
+	result.num[1] = rotate.num[1];
+	result.num[2] = rotate.num[2];
+	return result;
+}
+
+Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion)
+{
+	Matrix4x4 result;
+	result.m[0][0] = (quaternion.num[3] * quaternion.num[3]) + (quaternion.num[0] * quaternion.num[0]) - (quaternion.num[1] * quaternion.num[1]) - (quaternion.num[2] * quaternion.num[2]);
+	result.m[0][1] = 2 * ((quaternion.num[0] * quaternion.num[1]) + (quaternion.num[3] * quaternion.num[2]));
+	result.m[0][2] = 2 * ((quaternion.num[0] * quaternion.num[2]) - (quaternion.num[3] * quaternion.num[1]));
+	result.m[0][3] = 0;
+
+	result.m[1][0] = 2 * ((quaternion.num[0] * quaternion.num[1]) - (quaternion.num[3] * quaternion.num[2]));
+	result.m[1][1] = (quaternion.num[3] * quaternion.num[3]) - (quaternion.num[0] * quaternion.num[0]) + (quaternion.num[1] * quaternion.num[1]) - (quaternion.num[2] * quaternion.num[2]);
+	result.m[1][2] = 2 * ((quaternion.num[1] * quaternion.num[2]) + (quaternion.num[3] * quaternion.num[0]));
+	result.m[1][3] = 0;
+
+	result.m[2][0] = 2 * ((quaternion.num[0] * quaternion.num[2]) + (quaternion.num[3] * quaternion.num[1]));
+	result.m[2][1] = 2 * ((quaternion.num[1] * quaternion.num[2]) - (quaternion.num[3] * quaternion.num[0]));
+	result.m[2][2] = (quaternion.num[3] * quaternion.num[3]) - (quaternion.num[0] * quaternion.num[0]) - (quaternion.num[1] * quaternion.num[1]) + (quaternion.num[2] * quaternion.num[2]);
+	result.m[2][3] = 0;
+
+	result.m[3][0] = 0;
+	result.m[3][1] = 0;
+	result.m[3][2] = 0;
+	result.m[3][3] = 1;
+
+	return result;
+}

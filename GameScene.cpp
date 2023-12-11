@@ -8,11 +8,13 @@ void GameScene::Initialize(MyEngine* engine, DirectXCommon* dxCommon)
 	input_ = Input::GetInstance();
 	input_->Initialize();
 
-	rotation = MakeRotateAxisAngleQuaternion(Normalize(Vector3{ 1.0f,0.4f,-0.2f }), 0.45f);
-	Vector3 pointY = { 2.1f,-0.9f,1.3f };
-	rotateMatrix = MakeRotateMatrix(rotation);
-	rotateByQuaternion = RotateVector(pointY, rotation);
-	rotateByMatrix = VectorTransform(pointY, rotateMatrix);
+	Quaternion rotation0 = MakeRotateAxisAngleQuaternion({ 0.71f,0.71f,0.0f }, 0.3f);
+	Quaternion rotation1 = MakeRotateAxisAngleQuaternion({ 0.71f,0.0f,0.71f }, 3.141592f);
+	interpolate0 = Slerp(rotation0, rotation1, 0.0f);
+	interpolate1 = Slerp(rotation0, rotation1, 0.3f);
+	interpolate2 = Slerp(rotation0, rotation1, 0.5f);
+	interpolate3 = Slerp(rotation0, rotation1, 0.7f);
+	interpolate4 = Slerp(rotation0, rotation1, 1.0f);
 
 	triangleData_[0].position[0] = { -0.5f,-0.5f,0.0f,1.0f };
 	triangleData_[0].position[1] = { 0.0f,0.5f,0.0f,1.0f };
@@ -102,17 +104,16 @@ void GameScene::Update()
 #ifdef _DEBUG
 
 	ImGui::Begin("MT4");
-	ImGui::Text("rotation");
-	ImGui::Text("%4.2f %4.2f %4.2f %4.2f", rotation.num[0], rotation.num[1], rotation.num[2], rotation.num[3]);
-	ImGui::Text("rotateMatrix");
-	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix.m[0][0], rotateMatrix.m[0][1], rotateMatrix.m[0][2], rotateMatrix.m[0][3]);
-	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix.m[1][0], rotateMatrix.m[1][1], rotateMatrix.m[1][2], rotateMatrix.m[1][3]);
-	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix.m[2][0], rotateMatrix.m[2][1], rotateMatrix.m[2][2], rotateMatrix.m[2][3]);
-	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3][2], rotateMatrix.m[3][3]);
-	ImGui::Text("rotateByQuaternion");
-	ImGui::Text("%4.2f %4.2f %4.2f", rotateByQuaternion.num[0], rotateByQuaternion.num[1], rotateByQuaternion.num[2]);
-	ImGui::Text("rotateByMatrix");
-	ImGui::Text("%4.2f %4.2f %4.2f", rotateByMatrix.num[0], rotateByMatrix.num[1], rotateByMatrix.num[2]);
+	ImGui::Text("interpolate0, Slerp(q0, q1, 0.0f");
+	ImGui::Text("%4.2f %4.2f %4.2f %4.2f", interpolate0.num[0], interpolate0.num[1], interpolate0.num[2], interpolate0.num[3]);
+	ImGui::Text("interpolate1, Slerp(q0, q1, 0.3f");																  
+	ImGui::Text("%4.2f %4.2f %4.2f %4.2f", interpolate1.num[0], interpolate1.num[1], interpolate1.num[2], interpolate1.num[3]);
+	ImGui::Text("interpolate2, Slerp(q0, q1, 0.5f");																 
+	ImGui::Text("%4.2f %4.2f %4.2f %4.2f", interpolate2.num[0], interpolate2.num[1], interpolate2.num[2], interpolate2.num[3]);
+	ImGui::Text("interpolate3, Slerp(q0, q1, 0.7f");
+	ImGui::Text("%4.2f %4.2f %4.2f %4.2f", interpolate3.num[0], interpolate3.num[1], interpolate3.num[2], interpolate3.num[3]);
+	ImGui::Text("interpolate4, Slerp(q0, q1, 1.0f");															
+	ImGui::Text("%4.2f %4.2f %4.2f %4.2f", interpolate4.num[0], interpolate4.num[1], interpolate4.num[2], interpolate4.num[3]);
 	ImGui::End();
 
 #endif

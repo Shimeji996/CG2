@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <Windows.h>
 #include <wrl.h>
 #include <vector>
@@ -12,7 +12,7 @@ class Input
 {
 
 public:
-	// ƒCƒ“ƒi[ƒNƒ‰ƒX
+	// ã‚¤ãƒ³ãƒŠãƒ¼ã‚¯ãƒ©ã‚¹
 	struct MouseMove
 	{
 		LONG lx;
@@ -46,19 +46,19 @@ public:
 public:
 	static Input* GetInstance();
 
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void Initialize();
 
-	// XV
+	// æ›´æ–°
 	void Update();
 
-	// ƒL[‚ª‰Ÿ‚³‚ê‚½‚©‚ğƒ`ƒFƒbƒN
+	// ã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸã‹ã‚’ãƒã‚§ãƒƒã‚¯
 	bool PushKey(BYTE keyNumber);
 
-	// ƒgƒŠƒK[ƒ`ƒFƒbƒN
+	// ãƒˆãƒªã‚¬ãƒ¼ãƒã‚§ãƒƒã‚¯
 	bool TriggerKey(BYTE keyNumber);
 
-	// ƒWƒ‡ƒCƒXƒeƒBƒbƒN‚Ìó‘Ô
+	// ã‚¸ãƒ§ã‚¤ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®çŠ¶æ…‹
 	bool GetJoystickState(int32_t stickNo, XINPUT_STATE& out);
 
 private:
@@ -71,7 +71,7 @@ private:
 
 	std::vector<Joystick> devJoysticks_;
 
-	// ‘SƒL[‚Ìó‘Ô
+	// å…¨ã‚­ãƒ¼ã®çŠ¶æ…‹
 	BYTE key[256] = {};
 	BYTE preKey[256] = {};
 };

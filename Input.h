@@ -10,69 +10,75 @@
 
 class Input
 {
+public:
+    //インナークラス
+    struct MouseMove {
+        LONG lx;
+        LONG ly;
+        LONG lz;
+    };
 
 public:
-	// インナークラス
-	struct MouseMove
-	{
-		LONG lx;
-		LONG ly;
-		LONG lz;
-	};
+    enum class PadType {
+        DirectInput,
+        XInput
+    };
 
-public:
-	enum class PadType
-	{
-		DirectInput,
-		XInput
-	};
+    //variantがC++17から
+    union State
+    {
+        XINPUT_STATE xInput_;
+        DIJOYSTATE2 directInput_;
+    };
 
-	union State
-	{
-		XINPUT_STATE xInput_;
-		DIJOYSTATE2 directInput_;
-	};
+    struct Joystick {
+        Microsoft::WRL::ComPtr<IDirectInputDevice8> device_;
+        int32_t deadZoneL_;
+        int32_t deadZoneR_;
+        PadType type_;
+        State state_;
+        State statepre_;
+    };
 
-	struct Joystick 
-	{
-		Microsoft::WRL::ComPtr<IDirectInputDevice8> device_;
-		int32_t deadZoneL_;
-		int32_t deadZoneR_;
-		PadType type_;
-		State state_;
-		State statepre_;
-	};
+public://メンバ関数
+    static Input* GetInstance();
 
-public:
-	static Input* GetInstance();
+    /// <summary>
+    /// 初期化
+    /// </summary>
+    void Initialize();
 
-	// 初期化
-	void Initialize();
+    /// <summary>
+    /// 更新
+    /// </summary>
+    void Update();
 
-	// 更新
-	void Update();
+    /// <summary>
+    /// キーの押下をチェック
+    /// </summary>
+    bool PushKey(BYTE keyNumber);
 
-	// キーが押されたかをチェック
-	bool PushKey(BYTE keyNumber);
+    /// <summary>
+    /// キーのトリガーをチェック
+    /// </summary>
+    bool TriggerKey(BYTE keyNumber);
 
-	// トリガーチェック
-	bool TriggerKey(BYTE keyNumber);
-
-	// ジョイスティックの状態
-	bool GetJoystickState(int32_t stickNo, XINPUT_STATE& out);
+    /// <summary>
+    /// ジョイスティックの状態
+    /// </summary>
+    bool GetJoystickState(int32_t stickNo, XINPUT_STATE& out);
 
 private:
 
-	template <class Type> using ComPtr = Microsoft::WRL::ComPtr<Type>;
-	
-	ComPtr<IDirectInput8> directInput = nullptr;
-	ComPtr<IDirectInputDevice8> keyboard;
-	ComPtr<IDirectInputDevice8> devMouse_;
+    template <class Type> using ComPtr = Microsoft::WRL::ComPtr<Type>;
 
-	std::vector<Joystick> devJoysticks_;
+    ComPtr<IDirectInput8> directInput = nullptr;
+    ComPtr<IDirectInputDevice8> keyboard;
+    ComPtr<IDirectInputDevice8> devMouse_;
 
-	// 全キーの状態
-	BYTE key[256] = {};
-	BYTE preKey[256] = {};
+    std::vector<Joystick> devJoysticks_;
+    //全キーの状態
+    BYTE key[256] = {};
+    BYTE preKey[256] = {};
+
 };
-

@@ -11,29 +11,31 @@
 
 void Input::Initialize() {
 
-	HRESULT result;
-
-	//DiretxInputのインスタンス生成
-	result = DirectInput8Create(WinApp::GetInstance()->GetWc().hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
-	assert(SUCCEEDED(result));
-	//キーボードデバイス作成
-	result = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
-	assert(SUCCEEDED(result));
-	// 入力データ形式のセット
-	result = keyboard->SetDataFormat(&c_dfDIKeyboard);
-	assert(SUCCEEDED(result));
-	// 排他制御レベルのリセット
-	result = keyboard->SetCooperativeLevel(WinApp::GetInstance()->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
-	assert(SUCCEEDED(result));
+    HRESULT result;
+    //DiretxInputのインスタンス生成
+    //ComPtr<IDirectInput8> directInput = nullptr;
+    result = DirectInput8Create(WinApp::GetInstance()->GetWc().hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
+    assert(SUCCEEDED(result));
+    //キーボードデバイス作成
+    //ComPtr<IDirectInputDevice8> keyboard;
+    result = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
+    assert(SUCCEEDED(result));
+    //入力デーら形式のセット
+    result = keyboard->SetDataFormat(&c_dfDIKeyboard);
+    assert(SUCCEEDED(result));
+    //排他制御レベルのリセット
+    result = keyboard->SetCooperativeLevel(WinApp::GetInstance()->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+    assert(SUCCEEDED(result));
 }
 
 void Input::Update() {
-	// 前回のキー入力を保存
-	memcpy(preKey, key, sizeof(key));
-	// キーボード情報の取得
-	keyboard->Acquire();
-	// 全キーの入力情報を取得する
-	keyboard->GetDeviceState(sizeof(key), key);
+    //HRESULT result;
+    //前回のキー入力を保存
+    memcpy(preKey, key, sizeof(key));
+    //キーボード情報の取得開始
+    keyboard->Acquire();
+    //全キーの入力情報を取得する
+    keyboard->GetDeviceState(sizeof(key), key);
 }
 
 Input* Input::GetInstance() {

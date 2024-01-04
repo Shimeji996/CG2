@@ -16,6 +16,8 @@ struct D3DResourceLeakChecker
 class DirectXCommon
 {
 public:
+	static DirectXCommon* GetInstance();
+
 	void Initialization(const wchar_t* title, int32_t backBufferWidth = WinApp::kClientWidth, int32_t backBufferHeight = WinApp::kClientHeight);
 
 	void ImGuiInitialize();
@@ -60,6 +62,7 @@ private:
 	void UpdateFixFPS();
 
 private:
+
 	//DXGIファクトリーの生成
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_;
 

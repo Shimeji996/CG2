@@ -21,14 +21,22 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 			break;
 		}
 	}
+	//if (SpriteIndex < 0) {
+	//	//0より少ない
+	//	assert(false);
+	//}
+	//if (kMaxSpriteVertex < SpriteIndex) {
+	//	//MaxSpriteより多い
+	//	assert(false);
+	//}
 
 	//座標の設定
-	vertexData_[0].position = { a.num[0],b.num[1],0.0f,1.0f };
-	vertexData_[1].position = { a.num[0],a.num[1],0.0f,1.0f };
-	vertexData_[2].position = { b.num[0],b.num[1],0.0f,1.0f };
-	vertexData_[3].position = { a.num[0],a.num[1],0.0f,1.0f };
-	vertexData_[4].position = { b.num[0],a.num[1],0.0f,1.0f };
-	vertexData_[5].position = { b.num[0],b.num[1],0.0f,1.0f };
+	vertexData_[0].position = { a.num[0],b.num[1],0.0f,1.0f};
+	vertexData_[1].position = { a.num[0],a.num[1],0.0f,1.0f};
+	vertexData_[2].position = { b.num[0],b.num[1],0.0f,1.0f};
+	vertexData_[3].position = { a.num[0],a.num[1],0.0f,1.0f};
+	vertexData_[4].position = { b.num[0],a.num[1],0.0f,1.0f};
+	vertexData_[5].position = { b.num[0],b.num[1],0.0f,1.0f};
 
 	//Texcoordの設定
 	vertexData_[0].texcoord = { 0.0f,1.0f };
@@ -63,6 +71,12 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZmatrix(uvTransformSprite.rotate.num[2]));
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
 	materialData_->uvTransform = uvTransformMatrix;
+
+	//RootSignatureを設定。PS0とは別途設定が必要
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(engine_->GetRootSignature().Get());
+
+	//PS0を設定
+	dxCommon_->GetCommandList()->SetPipelineState(engine_->GetGraphicsPipelineState().Get());
 
 	//描画
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);

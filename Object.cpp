@@ -1,70 +1,74 @@
-#include "Object.h"
+ï»¿#include "Object.h"
 #include "Engine.h"
 #include <cmath>
 
-void Object::Initialize(DirectXCommon* dxCommon, MyEngine* engine) 
+void Object::Initialize(DirectXCommon* dxCommon, MyEngine* engine, const std::string& directoryPath, const std::string& filename)
 {
-
 	dxCommon_ = dxCommon;
 	engine_ = engine;
-	modelData = engine_->LoadObjFile("resources/", "plane.obj");
+	modelData = engine_->LoadObjFile(directoryPath, filename);
 	SettingVertex();
 	SettingColor();
 	SettingDictionalLight();
 	TransformMatrix();
-
 }
 
-void Object::Draw(const Vector4& material, const Transform& transform, uint32_t index, const Transform& cameraTransform, const DirectionalLight& light) 
+void Object::Draw(const Vector4& material, const Transform& transform, uint32_t index, const Transform& cameraTransform, const DirectionalLight& light, bool isLighting)
 {
-
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
 	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(dxCommon_->GetWin()->kClientWidth) / float(dxCommon_->GetWin()->kClientHeight), 0.1f, 100.0f);
+
 	Matrix4x4 wvpMatrix_ = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
 	uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZmatrix(uvTransformSprite.rotate.num[2]));
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
 
-	*materialData_ = { material,true };
+	*materialData_ = { material,isLighting };
 	materialData_->uvTransform = uvTransformMatrix;
 	*wvpData_ = { wvpMatrix_,worldMatrix };
 	*directionalLight_ = light;
 
-	//VBV‚ðÝ’è
+	//RootSignatureã‚’è¨­å®šã€‚PS0ã¨ã¯åˆ¥é€”è¨­å®šãŒå¿…è¦
+	dxCommon_->GetCommandList()->SetGraphicsRootSignature(engine_->GetRootSignature().Get());
+
+	//PS0ã‚’è¨­å®š
+	dxCommon_->GetCommandList()->SetPipelineState(engine_->GetGraphicsPipelineState().Get());
+
+	//VBVã‚’è¨­å®š
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
 
-	//Œ`ó‚ðÝ’èBPS0‚ÉÝ’è‚µ‚Ä‚¢‚é‚à‚Ì‚Æ‚Í‚Ü‚½•ÊB“¯‚¶‚à‚Ì‚ðÝ’è‚·‚é
+	//å½¢çŠ¶ã‚’è¨­å®šã€‚PS0ã«è¨­å®šã—ã¦ã„ã‚‹ã‚‚ã®ã¨ã¯ã¾ãŸåˆ¥ã€‚åŒã˜ã‚‚ã®ã‚’è¨­å®šã™ã‚‹
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	//ƒ}ƒeƒŠƒAƒ‹CBuffer‚ÌêŠ‚ðÝ’è
+	//ãƒžãƒ†ãƒªã‚¢ãƒ«CBufferã®å ´æ‰€ã‚’è¨­å®š
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 
-	//SRV‚ÌDescriptorTable‚Ìæ“ª‚ðÝ’èB2‚ÍrootParameter[2]‚Ì‚±‚Æ
+	//SRVã®DescriptorTableã®å…ˆé ­ã‚’è¨­å®šã€‚2ã¯rootParameter[2]ã®ã“ã¨
 	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, engine_->textureSrvHandleGPU_[index]);
 
-	//•`‰æ
+	//æç”»
 	//dxCommon_->GetCommandList()->DrawInstanced(vertexCount, 1, 0, 0);
 	dxCommon_->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 }
 
 void Object::Finalize()
 {
-	//	vertexResource->Release();
-	//	materialResource_->Release();
-	//	directionalLightResource_->Release();
-	//	wvpResource_->Release();
+	/*vertexResource->Release();
+	materialResource_->Release();
+	directionalLightResource_->Release();
+	wvpResource_->Release();*/
 }
 
 void Object::SettingVertex()
 {
 	//vertexResource = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(VertexData) * vertexCount);
 	vertexResource = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(VertexData) * modelData.vertices.size());
-	//ƒŠƒ\[ƒX‚Ìæ“ª‚ÌƒAƒhƒŒƒX‚©‚çŽg‚¤
+	//ãƒªã‚½ãƒ¼ã‚¹ã®å…ˆé ­ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‹ã‚‰ä½¿ã†
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
 
 	//vertexBufferView.SizeInBytes = sizeof(VertexData) * vertexCount;

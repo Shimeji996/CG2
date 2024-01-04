@@ -10,6 +10,13 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "Winmm.lib")
 
+DirectXCommon* DirectXCommon::GetInstance()
+{
+	static DirectXCommon instance;
+
+	return &instance;
+}
+
 void DirectXCommon::Initialization(const wchar_t* title, int32_t backBufferWidth, int32_t backBufferHeight)
 {
 	backBufferWidth_ = backBufferWidth;
@@ -17,14 +24,14 @@ void DirectXCommon::Initialization(const wchar_t* title, int32_t backBufferWidth
 
 	WinApp::GetInstance()->CreateWindowView(title, 1280, 720);
 
+	//FPS固定初期化
+	InitializeFixFPS();
+
 	//システムタイマーの分解能を上げる
 	timeBeginPeriod(1);
 
 	// DXGIデバイス初期化
 	InitializeDXGIDevice();
-
-	//FPS固定初期化
-	InitializeFixFPS();
 
 	// コマンド関連初期化
 	InitializeCommand();

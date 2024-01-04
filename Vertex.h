@@ -1,12 +1,13 @@
 #pragma once
 #include <stdint.h>
+#include <fstream>
+#include <sstream>
 #include "Matrix4x4.h"
 #include "Matrix3x3.h"
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
-#include <fstream>
-#include <sstream>
+
 #include <vector>
 
 struct VertexData
@@ -57,4 +58,10 @@ struct MaterialData {
 struct ModelData {
 	std::vector<VertexData> vertices;
 	MaterialData material;
+};
+
+struct ParticleForGPU {
+	Matrix4x4 WVP;
+	Matrix4x4 World;
+	Vector4 color;
 };

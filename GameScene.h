@@ -7,17 +7,23 @@
 #include "Triangle.h"
 #include "Sprite.h"
 #include "Sphere.h"
+#include "Object.h"
+#include "Input.h"
+#include "Sound.h"
+#include "Particle.h"
+#include "Scene.h"
+#include <random>
 
-class GameScene
+class GameScene : public Scene
 {
 public:
-	void Initialize(MyEngine* engine, DirectXCommon* dxCommon);
+	void Initialize(MyEngine* engine, DirectXCommon* dxCommon) override;
 
-	void Update();
+	void Update() override;
 
-	void Draw();
+	void Draw() override;
 
-	void Finalize();
+	void Finalize() override;
 
 private:
 	MyEngine* engine_;
@@ -37,6 +43,11 @@ private:
 	Vector4 sphereMaterial_;
 	Matrix4x4 sphereMatrix_;
 
+	Object* object_[2];
+	Transform objectTransform_[2];
+	Vector4 objectMaterial_[2];
+	Matrix4x4 objectMatrix_;
+
 	Transform cameraTransform_;
 
 	uint32_t uvResourceNum_;
@@ -44,10 +55,23 @@ private:
 
 	DirectionalLight directionalLight_;
 
+	Sound* sound_;
+	SoundData soundDataHandle_;
+
+	Input* input_ = nullptr;
+
+	Particle* particle;
+	ParticleData particles[10];
+
+	std::random_device seedGenerator;
+
+	const float kDeltaTime = 1.0f / 60.0f;
+
 	bool texture_;
 
 	bool triangleDrawA_;
 	bool triangleDrawB_;
 	int sphereDraw_;
 	int spriteDraw_;
+	int objectDraw_;
 };

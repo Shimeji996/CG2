@@ -454,3 +454,94 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 	result.m[3][3] = 1;
 	return result;
 }
+
+//任意軸回転行列
+Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle)
+{
+	Matrix4x4 result;
+
+	result.m[0][0] = (axis.num[0] * axis.num[0]) * (1 - cos(angle)) + cos(angle);
+	result.m[0][1] = (axis.num[0] * axis.num[1]) * (1 - cos(angle)) + axis.num[2] * sin(angle);
+	result.m[0][2] = (axis.num[0] * axis.num[2]) * (1 - cos(angle)) - axis.num[1] * sin(angle);
+	result.m[0][3] = 0;
+
+	result.m[1][0] = (axis.num[0] * axis.num[1]) * (1 - cos(angle)) - axis.num[2] * sin(angle);
+	result.m[1][1] = (axis.num[1] * axis.num[1]) * (1 - cos(angle)) + cos(angle);
+	result.m[1][2] = (axis.num[1] * axis.num[2]) * (1 - cos(angle)) + axis.num[0] * sin(angle);
+	result.m[1][3] = 0;
+
+	result.m[2][0] = (axis.num[0] * axis.num[2]) * (1 - cos(angle)) + axis.num[1] * sin(angle);
+	result.m[2][1] = (axis.num[1] * axis.num[2]) * (1 - cos(angle)) - axis.num[0] * sin(angle);
+	result.m[2][2] = (axis.num[2] * axis.num[2]) * (1 - cos(angle)) + cos(angle);
+	result.m[2][3] = 0;
+
+	result.m[3][0] = 0;
+	result.m[3][1] = 0;
+	result.m[3][2] = 0;
+	result.m[3][3] = 1;
+
+	return result;
+}
+
+Vector3 Cross(const Vector3& v1, const Vector3& v2)
+{
+	Vector3 result;
+	result.num[0] = (v1.num[1] * v2.num[2]) - (v1.num[2] * v2.num[1]);
+	result.num[1] = (v1.num[2] * v2.num[0]) - (v1.num[0] * v2.num[2]);
+	result.num[2] = (v1.num[0] * v2.num[1]) - (v1.num[1] * v2.num[0]);
+	return result;
+}
+
+Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to)
+{
+	Matrix4x4 result;
+	Vector3 cross = Cross(from, to);
+	Vector3 n = Normalise(Cross(from, to));
+	// u = -v のとき　つまり反転してしまった時
+	if (from.num[0] == -to.num[0] && from.num[1] == -to.num[1] && from.num[2] == -to.num[2]) {
+		if (from.num[0] != 0.0f || from.num[1] != 0.0f) {
+			n = { from.num[1],-from.num[0],0.0f };
+		}
+		else if (from.num[0] != 0.0f || from.num[2] != 0.0f) {
+			n = { from.num[2],0.0f,-from.num[0] };
+		}
+	}
+
+	float costhata = Dot(from, to);
+	float sinthata = Length(cross);
+	result.m[0][0] = (n.num[0] * n.num[0]) * (1 - costhata) + costhata;
+	result.m[0][1] = (n.num[0] * n.num[1]) * (1 - costhata) + n.num[2] * sinthata;
+	result.m[0][2] = (n.num[0] * n.num[2]) * (1 - costhata) - n.num[1] * sinthata;
+	result.m[0][3] = 0;
+
+	result.m[1][0] = (n.num[0] * n.num[1]) * (1 - costhata) - n.num[2] * sinthata;
+	result.m[1][1] = (n.num[1] * n.num[1]) * (1 - costhata) + costhata;
+	result.m[1][2] = (n.num[1] * n.num[2]) * (1 - costhata) + n.num[0] * sinthata;
+	result.m[1][3] = 0;
+
+	result.m[2][0] = (n.num[0] * n.num[2]) * (1 - costhata) + n.num[1] * sinthata;
+	result.m[2][1] = (n.num[1] * n.num[2]) * (1 - costhata) - n.num[0] * sinthata;
+	result.m[2][2] = (n.num[2] * n.num[2]) * (1 - costhata) + costhata;
+	result.m[2][3] = 0;
+
+	result.m[3][0] = 0;
+	result.m[3][1] = 0;
+	result.m[3][2] = 0;
+	result.m[3][3] = 1;
+
+	return result;
+}
+
+Vector3 VectorTransform(const Vector3& vector, const Matrix4x4& matrix)
+{
+	Vector3 result;
+	result.num[0] = vector.num[0] * matrix.m[0][0] + vector.num[1] * matrix.m[1][0] + vector.num[2] * matrix.m[2][0] + 1.0f * matrix.m[3][0];
+	result.num[1] = vector.num[0] * matrix.m[0][1] + vector.num[1] * matrix.m[1][1] + vector.num[2] * matrix.m[2][1] + 1.0f * matrix.m[3][1];
+	result.num[2] = vector.num[0] * matrix.m[0][2] + vector.num[1] * matrix.m[1][2] + vector.num[2] * matrix.m[2][2] + 1.0f * matrix.m[3][2];
+	float w = vector.num[0] * matrix.m[0][3] + vector.num[1] * matrix.m[1][3] + vector.num[2] * matrix.m[2][3] + 1.0f * matrix.m[3][3];
+	assert(w != 0.0f);
+	result.num[0] /= w;
+	result.num[1] /= w;
+	result.num[2] /= w;
+	return result;
+}

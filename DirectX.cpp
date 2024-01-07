@@ -297,7 +297,7 @@ void DirectXCommon::PostDraw()
 	hr_;
 
 	//実際のCommandListのコマンドを積む
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
+	//ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
 
 	//画面描画処理の終わり、状態を遷移
 	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;

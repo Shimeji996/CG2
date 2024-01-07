@@ -36,6 +36,8 @@ public:
 
 	static WinApp* GetInstance();
 
+	WNDCLASS GetWc() { return wc_; }
+
 private:
 	UINT windowStyle_;
 

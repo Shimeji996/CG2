@@ -56,6 +56,7 @@ private:
 	void CreateDepthStensil();
 
 private:
+
 	//DXGIファクトリーの生成
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_;
 

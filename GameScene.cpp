@@ -5,78 +5,219 @@ void GameScene::Initialize(MyEngine* engine, DirectXCommon* dxCommon)
 	engine_ = engine;
 	dxCommon_ = dxCommon;
 
-	triangleData_[0].position[0] = { -0.5f,-0.5f,0.0f,1.0f };
-	triangleData_[0].position[1] = { 0.0f,0.5f,0.0f,1.0f };
-	triangleData_[0].position[2] = { 0.5f,-0.5f,0.0f,1.0f };
-	triangleData_[0].material = { 1.0f,1.0f,1.0f,1.0f };
+	TDInitialize(dxCommon_, engine_);
 
-	triangleData_[1].position[0] = { -0.5f,-0.5f,0.5f,1.0f };
-	triangleData_[1].position[1] = { 0.0f,0.0f,0.0f,1.0f };
-	triangleData_[1].position[2] = { 0.5f,-0.5f,-0.5f,1.0f };
-	triangleData_[1].material = { 1.0f,1.0f,1.0f,1.0f };
+	//scale
+	//rotate
+	//translate
 
-	for (int i = 0; i < 2; i++)
-	{
-		transform_[i] = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-20.0f} };
+
+	/*soundDataHandle_ = sound_->LoadWave("Audio/fanfare.wav");*/
+
+	for (int i = 0; i < kMaxObject; i++) {
+		ObjectSize[i].num[0] = 0.5f;
+		ObjectSize[i].num[1] = 0.5f;
+		ObjectSize[i].num[2] = 0.5f;
+
+		objectTransform_[i] = { {0.5f,0.5f,0.5f},{0.0f,0.0f,0.0f},{ -4.0f + 1.0f * i,  -8.0f + 2.5f * i,0.0f} };
+
+		objectMaterial_[i] = { 1.0f,1.0f,1.0f,1.0f };
 	}
 
-	triangleDrawA_ = false;
-	triangleDrawB_ = false;
+	//サイズ
+	ObjectSize[0].num[0] = 5.0f;
+	ObjectSize[0].num[1] = 0.5f;
+	ObjectSize[0].num[2] = 0.5f;
+	//座標
+	/*objectTransform_[0] = { {1.0f * ObjectSize[0].num[0],1.0f * ObjectSize[0].num[1],1.0f * ObjectSize[0].num[2]},{0.0f,0.0f,0.0f},{-5.0f,-3.3f,0.0f} };
 
-	spriteData_.LeftTop[0] = { 0.0f,0.0f,0.0f,1.0f };
-	spriteData_.RightDown[0] = { 640.0f,360.0f,0.0f,1.0f };
-	spriteData_.LeftTop[1] = { 0.0f,0.0f,0.0f,1.0f };
-	spriteData_.RightDown[1] = { 640.0f,360.0f,0.0f,1.0f };
-	spriteData_.material = { 1.0f,1.0f,1.0f,1.0f };
-	spriteTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	objectTransform_[1] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{0.0f,-1.0f,0.0f} };
 
-	spriteDraw_ = false;
+	objectTransform_[2] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{2.0f,2.0f,0.0f} };
 
-	sphereTransform_ = { {0.4f,0.4f,0.4f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	sphereMaterial_ = { 1.0f,1.0f,1.0f,1.0f };
+	objectTransform_[3] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-2.0f,5.0f,0.0f} };
 
-	sphereDraw_ = false;
+	objectTransform_[4] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[0].num[1],1.0f * ObjectSize[0].num[2]},{0.0f,0.0f,0.0f},{-5.0f,11.0f,0.0f} };
+
+	objectTransform_[5] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{4.0f,4.0f,0.0f} };
+
+	objectTransform_[6] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-4.0f,6.0f,0.0f} };
+
+	objectTransform_[7] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-2.0f,10.0f,0.0f} };
+
+	objectTransform_[8] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[0].num[1],1.0f * ObjectSize[0].num[2]},{0.0f,0.0f,0.0f},{-1.0f,7.0f,0.0f} };
+
+	objectTransform_[9] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{3.0f,9.0f,0.0f} };
+
+	objectTransform_[10] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-7.0f,8.0f,0.0f} };
+
+	objectTransform_[11] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-8.0f,-1.5f,0.0f} };
+
+	objectTransform_[12] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-7.5f,4.5f,0.0f} };
+
+	objectTransform_[13] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-6.0f,1.5f,0.0f} };
+
+	objectTransform_[14] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-10.0f,6.5f,0.0f} };
+
+	objectTransform_[15] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-12.0f,7.5f,0.0f} };
+
+	objectTransform_[16] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-4.0f,0.5f,0.0f} };
+
+	objectTransform_[17] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-9.0f,10.5f,0.0f} };
+
+	objectTransform_[18] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{0.0f,13.5f,0.0f} };
+
+	objectTransform_[19] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{5.0f,5.5f,0.0f} };
+
+	objectTransform_[20] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-7.0f,15.5f,0.0f} };
+
+	objectTransform_[21] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-5.0f,11.0f,0.0f} };
+
+	objectTransform_[22] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{1.0f,12.0f,0.0f} };
+
+	objectTransform_[23] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-3.0f,17.0f,0.0f} };*/
+
+	playerTransform_ = { {1.0f * PlayerSize.num[0],1.0f * PlayerSize.num[1],1.0f * PlayerSize.num[2]},{0.0f,0.0f,0.0f},{-5.0f,-2.8f,0.0f} };
+	playerMaterial_ = { 1.0f,1.0f,1.0f,1.0f };
+
+	goalTransform_ = { {1.0f * goalSize.num[0],1.0f * goalSize.num[1],1.0f * goalSize.num[2]},{0.0f,0.0f,0.0f},{0.0f,20.0f,0.0f} };
+	goalMaterial_ = { 1.0f,1.0f,1.0f,1.0f };
+
+	objectDraw_ = true;
+	drop = true;
 
 	directionalLight_.color = { 1.0f,1.0f,1.0f,1.0f };
 	directionalLight_.direction = { 0.0f,-1.0f,0.0f };
 	directionalLight_.intensity = 1.0f;
 
-	texture_ = 0;
-	uvResourceNum_ = 0;
-	engine_->SettingTexture("resources/uvChecker.png", uvResourceNum_);
+}
 
-	monsterBallResourceNum_ = 1;
-	engine_->SettingTexture("resources/monsterBall.png", monsterBallResourceNum_);
+void GameScene::Update() {
+
+	input_->Update();
+
+	MatrixUpdate();
+
+	//sound_->PlayWave(soundDataHandle_);
+
+	playerAcceleration_ = -0.02f;
+
+	goalTransform_.rotate.num[1] += 0.1f;
+
+	if (drop == true && isJump_ == false) {
+		playerTransform_.translate.num[1] -= 0.01f;
+	}
+
+	if (input_->PushKey(DIK_LEFT) || (input_->PushKey(DIK_A))) {
+		playerTransform_.translate.num[0] -= 0.1f;
+	}
+	else if (input_->PushKey(DIK_RIGHT) || (input_->PushKey(DIK_D))) {
+		playerTransform_.translate.num[0] += 0.1f;
+	}
+
+	if (input_->TriggerKey(DIK_SPACE) && isJump_ == false) {
+		isJump_ = true;
+		playerSpeed_ = 0.38f;
+	}
+
+	if (isJump_ == true) {
+		playerSpeed_ += playerAcceleration_;
+		playerTransform_.translate.num[1] += playerSpeed_;
+	}
+
+	//カメラスクロール
+	cameraTransform_.translate.num[0] = playerTransform_.translate.num[0] - playerTransform_.translate.num[0] / 15;
+	cameraTransform_.translate.num[1] = playerTransform_.translate.num[1] + 4.8f + playerTransform_.translate.num[1] / 65.0f;
+	cameraTransform_.rotate.num[0] = 0.2f;
+
+	for (int i = 0; i < kMaxObject; i++) {
+		aabb1 = AABBadd(playerTransform_.translate, PlayerSize);
+		aabb2 = AABBadd(objectTransform_[i].translate, ObjectSize[i]);
+		aabb3 = AABBadd(goalTransform_.translate, goalSize);
+		if (IsCollision(aabb1, aabb2)) {
+			isJump_ = false;
+			drop = false;
+			playerSpeed_ = 0;
+
+			float sentorPos = (playerTransform_.translate.num[0] - objectTransform_[i].translate.num[0]) * (playerTransform_.translate.num[0] - objectTransform_[i].translate.num[0]) + (playerTransform_.translate.num[1] - objectTransform_[i].translate.num[1]) * (playerTransform_.translate.num[1] - objectTransform_[i].translate.num[1]);
+
+			if (sentorPos <= playerTransform_.scale.num[1] + objectTransform_[i].scale.num[1] || IsCollision(aabb1, aabb2)) {
+
+				float D = (playerTransform_.scale.num[1] + objectTransform_[i].scale.num[1]) - (playerTransform_.translate.num[1] - objectTransform_[i].translate.num[1]);
+				playerTransform_.translate.num[1] += D;
+				break;
+			}
+
+			break;
+		}
+		else {
+			isJump_ = true;
+			drop = true;
+		}
+
+	}
+
+}
+
+void GameScene::Draw()
+{
+
+	player_->Draw(playerMaterial_, playerTransform_, 0, cameraTransform_, directionalLight_);
+
+	goal_->Draw(goalMaterial_, goalTransform_, 5, cameraTransform_, directionalLight_);
+
+	for (int i = 0; i < kMaxObject; i++) {
+		object_[i]->Draw(objectMaterial_[i], objectTransform_[i], 1, cameraTransform_, directionalLight_);
+	}
+
+}
+
+Transform GameScene::SetPlayer() {
+	playerTransform_ = { {1.0f * PlayerSize.num[0],1.0f * PlayerSize.num[1],1.0f * PlayerSize.num[2]},{0.0f,0.0f,0.0f},{-5.0f,-2.8f,0.0f} };
+	return playerTransform_;
+}
+
+void GameScene::TDInitialize(DirectXCommon* dxCommon, MyEngine* engine) {
+
+	sound_ = new Sound();
+	sound_->Initialize();
+
+	input_ = Input::GetInstance();
+	input_->Initialize();
+
+	player_ = new Object();
+	player_->Initialize(dxCommon, engine);
+
+	goal_ = new Object();
+	goal_->Initialize(dxCommon, engine);
+
+	textureManager_ = new TextureManager();
+	textureManager_->Initialize(engine);
+
+	for (int i = 0; i < kMaxObject; i++) {
+		object_[i] = new Object();
+		object_[i]->Initialize(dxCommon, engine);
+	}
 
 	for (int i = 0; i < 2; i++)
 	{
 		triangle_[i] = new Triangle();
-		triangle_[i]->Initialize(dxCommon_, engine_);
+		triangle_[i]->Initialize(dxCommon, engine);
 	}
 
 	for (int i = 0; i < 2; i++)
 	{
 		sprite_[i] = new Sprite();
-		sprite_[i]->Initialize(dxCommon_, engine_);
+		sprite_[i]->Initialize(dxCommon, engine);
 	}
 
 	sphere_ = new Sphere();
-	sphere_->Initialize(dxCommon_, engine_);
+	sphere_->Initialize(dxCommon, engine);
 
-	cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-5.0f} };
 }
 
-void GameScene::Update()
-{
-	for (int i = 0; i < 2; i++)
-	{
-		transform_[i].rotate.num[1] += 0.01f;
-		worldMatrix_ = MakeAffineMatrix(transform_[i].scale, transform_[i].rotate, transform_[i].translate);
-	}
-
-	sphereTransform_.rotate.num[1] += 0.01f;
-	sphereMatrix_ = MakeAffineMatrix(sphereTransform_.scale, sphereTransform_.rotate, sphereTransform_.translate);
-
+void GameScene::MatrixUpdate() {
 	Matrix4x4 sphereAffine = MakeAffineMatrix(sphereTransform_.scale, sphereTransform_.rotate, sphereTransform_.translate);
 	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
@@ -87,143 +228,15 @@ void GameScene::Update()
 	sphereMatrix_ = Multiply(sphereAffine, Multiply(viewMatrix, projectionMatrix));
 
 	directionalLight_.direction = Normalise(directionalLight_.direction);
-
-
-	ImGui::Begin("OPTION");
-	if (ImGui::TreeNode("Triangle"))
-	{
-		if (ImGui::Button("TriangleA"))
-		{
-			if (triangleDrawA_ == false)
-			{
-				triangleDrawA_ = true;
-			}
-			else {
-				triangleDrawA_ = false;
-			}
-		}
-
-		if (ImGui::Button("TriangleB"))
-		{
-			if (triangleDrawB_ == false)
-			{
-				triangleDrawB_ = true;
-			}
-			else {
-				triangleDrawB_ = false;
-			}
-		}
-
-		if (triangleDrawA_ == true)
-		{
-			if (ImGui::TreeNode("Triangle1"))
-			{
-				ImGui::DragFloat3("Translate", transform_[0].translate.num, 0.05f);
-				ImGui::DragFloat3("Rotate", transform_[0].rotate.num, 0.05f);
-				ImGui::DragFloat3("Scale", transform_[0].scale.num, 0.05f);
-				ImGui::ColorEdit4("Color", triangleData_[0].material.num, 0);
-				ImGui::TreePop();
-			}
-		}
-		if (triangleDrawB_ == true)
-		{
-			if (ImGui::TreeNode("Triangle2"))
-			{
-				ImGui::DragFloat3("Translate2", transform_[1].translate.num, 0.05f);
-				ImGui::DragFloat3("Rotate2", transform_[1].rotate.num, 0.05f);
-				ImGui::DragFloat3("Scale2", transform_[1].scale.num, 0.05f);
-				ImGui::ColorEdit4("Color", triangleData_[1].material.num, 0);
-				ImGui::TreePop();
-			}
-		}
-		ImGui::TreePop();
-	}
-	if (ImGui::TreeNode("obj"))
-	{
-		if (ImGui::Button("obj"))
-		{
-			if (sphereDraw_ == false)
-			{
-				sphereDraw_ = true;
-			}
-			else {
-				sphereDraw_ = false;
-			}
-		}
-
-		ImGui::DragFloat3("Translate", sphereTransform_.translate.num, 0.05f);
-		ImGui::DragFloat3("Rotate", sphereTransform_.rotate.num, 0.05f);
-		ImGui::DragFloat3("Scale", sphereTransform_.scale.num, 0.05f);
-		ImGui::ColorEdit4("Color", sphereMaterial_.num, 0);
-		ImGui::Checkbox("ChangeTexture", &texture_);
-		ImGui::DragFloat4("LightColor", directionalLight_.color.num, 1.0f);
-		ImGui::DragFloat3("DirectionLight", directionalLight_.direction.num, 0.1f);
-		ImGui::DragFloat2("UVTranslate", &sphere_->uvTransformSprite.translate.num[0], 0.01f, -10.0f, 10.0f);
-		ImGui::DragFloat2("UVScale", &sphere_->uvTransformSprite.scale.num[0], 0.01f, -10.0f, 10.0f);
-		ImGui::SliderAngle("UVRotate", &sphere_->uvTransformSprite.rotate.num[2]);
-
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNode("Sprite"))
-	{
-		if (ImGui::Button("Sprite"))
-		{
-			if (spriteDraw_ == false)
-			{
-				spriteDraw_ = true;
-			}
-			else {
-				spriteDraw_ = false;
-			}
-		}
-
-		ImGui::DragFloat3("Translate", spriteTransform_.translate.num, 0.05f);
-		ImGui::DragFloat3("Rotate", spriteTransform_.rotate.num, 0.05f);
-		ImGui::DragFloat3("Scale", spriteTransform_.scale.num, 0.05f);
-		ImGui::ColorEdit4("Color", spriteData_.material.num, 0);
-		for (int i = 0; i < 2; i++) {
-			ImGui::DragFloat2("UVTranslate", &sprite_[i]->uvTransformSprite.translate.num[0], 0.01f, -10.0f, 10.0f);
-			ImGui::DragFloat2("UVScale", &sprite_[i]->uvTransformSprite.scale.num[0], 0.01f, -10.0f, 10.0f);
-			ImGui::SliderAngle("UVRotate", &sprite_[i]->uvTransformSprite.rotate.num[2]);
-		}
-		ImGui::TreePop();
-	}
-
-	if (ImGui::TreeNode("Camera"))
-	{
-		ImGui::DragFloat3("Translate", cameraTransform_.translate.num, 0.05f);
-		ImGui::DragFloat3("Rotate", cameraTransform_.rotate.num, 0.05f);
-		ImGui::DragFloat3("Scale", cameraTransform_.scale.num, 0.05f);
-		ImGui::TreePop();
-	}
-	ImGui::End();
 }
 
-void GameScene::Draw()
-{
-	if (triangleDrawA_)
+bool GameScene::IsCollision(const AABB& aabb1, const AABB& aabb2) {
+	if (aabb1.min.num[0] >= aabb2.max.num[0] && aabb1.max.num[0] <= aabb2.min.num[0] && //左右
+		aabb1.min.num[1] >= aabb2.max.num[1] && aabb1.max.num[1] <= aabb2.min.num[1])
 	{
-		triangle_[0]->Draw(triangleData_[0].position[0], triangleData_[0].position[1], triangleData_[0].position[2], triangleData_[0].material, transform_[0], cameraTransform_, uvResourceNum_, directionalLight_);
+		return true;
 	}
-
-	if (triangleDrawB_)
-	{
-		triangle_[1]->Draw(triangleData_[1].position[0], triangleData_[1].position[1], triangleData_[1].position[2], triangleData_[1].material, transform_[1], cameraTransform_, uvResourceNum_, directionalLight_);
-	}
-
-	if (sphereDraw_)
-	{
-		sphere_->Draw(sphereMaterial_, sphereTransform_, texture_, cameraTransform_, directionalLight_);
-	}
-
-	if (spriteDraw_)
-	{
-		for (int i = 0; i < 1; i++)
-		{
-			sprite_[i]->Draw(spriteData_.LeftTop[i], spriteData_.RightDown[i], spriteTransform_, spriteData_.material, uvResourceNum_, directionalLight_);
-		}
-	}
+	return false;
 }
 
 void GameScene::Finalize()
@@ -242,5 +255,43 @@ void GameScene::Finalize()
 
 	sphere_->Finalize();
 
+	for (int i = 0; i < kMaxObject; i++)
+	{
+		object_[i]->Finalize();
+		delete object_[i];
+	}
+
+	player_->Finalize();
+	delete player_;
+
+	goal_->Finalize();
+	delete goal_;
+
+	sound_->Finalize();
+	sound_->UnLoad(&soundDataHandle_);
+
 	delete sphere_;
+	delete sound_;
+}
+
+void GameScene::SetPlayerPos(float y) {
+	playerTransform_.translate.num[1] = y;
+}
+
+AABB GameScene::AABBadd(Vector3 a, Vector3 objectSize) {
+	AABB aabb{};
+	for (int i = 0; i < kMaxObject; i++) {
+		aabb.min = { 1.0f * objectSize.num[0],1.0f * objectSize.num[1],-1.0f * objectSize.num[2] };
+		aabb.max = { -1.0f * objectSize.num[0],-1.0f * objectSize.num[1],1.0f * objectSize.num[2] };
+
+		aabb.min.num[0] += a.num[0];
+		aabb.min.num[1] += a.num[1];
+		aabb.min.num[2] += a.num[2];
+
+		aabb.max.num[0] += a.num[0];
+		aabb.max.num[1] += a.num[1];
+		aabb.max.num[2] += a.num[2];
+
+	}
+	return aabb;
 }

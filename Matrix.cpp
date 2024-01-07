@@ -454,3 +454,17 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 	result.m[3][3] = 1;
 	return result;
 }
+
+Vector3 TransformCoord(Vector3 vector, Matrix4x4 matrix) {
+	Vector3 result{};
+	result.num[0] = vector.num[0] * matrix.m[0][0] + vector.num[1] * matrix.m[1][0] + vector.num[2] * matrix.m[2][0] + 1.0f * matrix.m[3][0];
+	result.num[1] = vector.num[0] * matrix.m[0][1] + vector.num[1] * matrix.m[1][1] + vector.num[2] * matrix.m[2][1] + 1.0f * matrix.m[3][1];
+	result.num[2] = vector.num[0] * matrix.m[0][2] + vector.num[1] * matrix.m[1][2] + vector.num[2] * matrix.m[2][2] + 1.0f * matrix.m[3][2];
+
+	float w = vector.num[0] * matrix.m[0][3] + vector.num[1] * matrix.m[1][3] + vector.num[2] * matrix.m[2][3] + 1.0f * matrix.m[3][3];
+	assert(w != 0.0f);
+	result.num[0] /= w;
+	result.num[1] /= w;
+	result.num[2] /= w;
+	return result;
+}

@@ -1,7 +1,8 @@
 #include "Engine.h"
-#include "GameScene.h"
+#include "SceneManager.h"
+#include "TextureManager.h"
 
-const wchar_t kWindowTitle[] = { L"CG2_マスダリュウ" };
+const wchar_t kWindowTitle[] = { L"CG2_WinMain" };
 
 //Windowsアプリでのエントリーポイント
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -17,8 +18,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	MyEngine* engine = new MyEngine;
 	engine->Initialize(kWindowTitle, 1280, 720);
 
-	GameScene* gameScene = new GameScene();
-	gameScene->Initialize(engine, engine->GetDirectXCommon());
+	SceneManager* sceneManager = new SceneManager();
+	sceneManager->Initialize(engine, engine->GetDirectXCommon());
 
 	while (true)
 	{
@@ -31,20 +32,52 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//ゲームの処理
 		engine->BeginFrame();
 
-		gameScene->Update();
+		switch (sceneManager->GetScene())
+		{
+		case TITLE:
 
-		gameScene->Draw();
+			sceneManager->TitleUpdate();
 
+			sceneManager->TitleDraw();
+
+			break;
+
+		case PLAY:
+
+			sceneManager->GameUpdate();
+
+			sceneManager->GameDraw();
+
+			break;
+
+		case CLEAR:
+
+			sceneManager->ClearUpdate();
+
+			sceneManager->ClearDraw();
+
+			break;
+
+		case OVER:
+
+			sceneManager->GameOverUpdate();
+
+			sceneManager->GameOverDraw();
+
+			break;
+
+		}
 		engine->EndFrame();
 	}
 
 	//解放処理
-	gameScene->Finalize();
 
 	engine->Finalize();
 
+	sceneManager->Finalize();
+
 	delete engine;
-	delete gameScene;
+	delete sceneManager;
 
 	CoUninitialize();
 

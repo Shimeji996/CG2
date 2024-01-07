@@ -1,12 +1,13 @@
 #pragma once
 #include <stdint.h>
+#include <fstream>
+#include <sstream>
 #include "Matrix4x4.h"
 #include "Matrix3x3.h"
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
-#include <fstream>
-#include <sstream>
+
 #include <vector>
 
 struct VertexData

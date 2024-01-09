@@ -35,8 +35,8 @@ public:
 
 	DirectXCommon* GetDirectXCommon() { return dxCommon_; }
 
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_[2];
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_[2];
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_[10];
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_[10];
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorheap, uint32_t descriptorSize, uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorheap, uint32_t descriptorSize, uint32_t index);
@@ -75,12 +75,12 @@ private:
 	//頂点リソースにデータを書き込む
 	Vector4* vertexData_;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource_[2];
+	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource_[10];
 
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource_[2];
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResources_[2];
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource_[10];
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResources_[10];
 	uint32_t descriptorSizeSRV;
 	uint32_t descriptorSizeRTV;
 	uint32_t descriptorSizeDSV;

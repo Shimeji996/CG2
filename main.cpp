@@ -2,7 +2,7 @@
 #include "SceneManager.h"
 #include "TextureManager.h"
 
-const wchar_t kWindowTitle[] = { L"CG2_WinMain" };
+const wchar_t kWindowTitle[] = { L"LE2B_17_マスダリュウ" };
 
 //Windowsアプリでのエントリーポイント
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)

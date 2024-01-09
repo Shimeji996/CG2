@@ -20,7 +20,7 @@ void GameScene::Initialize(MyEngine* engine, DirectXCommon* dxCommon)
 		ObjectSize[i].num[1] = 0.5f;
 		ObjectSize[i].num[2] = 0.5f;
 
-		objectTransform_[i] = { {0.5f,0.5f,0.5f},{0.0f,0.0f,0.0f},{ -4.0f + 1.0f * i,  -8.0f + 2.5f * i,0.0f} };
+		objectTransform_[i] = { {0.5f,0.5f,0.5f},{0.0f,0.0f,0.0f},{ -4.0f + 1.0f * i,  -8.0f + 2.5f,0.0f} };
 
 		objectMaterial_[i] = { 1.0f,1.0f,1.0f,1.0f };
 	}
@@ -29,59 +29,45 @@ void GameScene::Initialize(MyEngine* engine, DirectXCommon* dxCommon)
 	ObjectSize[0].num[0] = 5.0f;
 	ObjectSize[0].num[1] = 0.5f;
 	ObjectSize[0].num[2] = 0.5f;
+
 	//座標
-	/*objectTransform_[0] = { {1.0f * ObjectSize[0].num[0],1.0f * ObjectSize[0].num[1],1.0f * ObjectSize[0].num[2]},{0.0f,0.0f,0.0f},{-5.0f,-3.3f,0.0f} };
+	objectTransform_[0] = { {1.0f * ObjectSize[0].num[0],1.0f * ObjectSize[0].num[1],1.0f * ObjectSize[0].num[2]},{0.0f,0.0f,0.0f},{-5.0f,-3.3f,0.0f} };
 
-	objectTransform_[1] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{0.0f,-1.0f,0.0f} };
+	objectTransform_[1] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{3.0f,-1.0f,0.0f} };
 
-	objectTransform_[2] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{2.0f,2.0f,0.0f} };
+	objectTransform_[2] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{6.0f,-5.0f,0.0f} };
 
-	objectTransform_[3] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-2.0f,5.0f,0.0f} };
+	objectTransform_[3] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{8.0f,0.0f,0.0f} };
 
-	objectTransform_[4] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[0].num[1],1.0f * ObjectSize[0].num[2]},{0.0f,0.0f,0.0f},{-5.0f,11.0f,0.0f} };
+	objectTransform_[4] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{12.0f,-2.0f,0.0f} };
 
-	objectTransform_[5] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{4.0f,4.0f,0.0f} };
+	objectTransform_[5] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{10.0f,-4.0f,0.0f} };
 
-	objectTransform_[6] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-4.0f,6.0f,0.0f} };
+	objectTransform_[6] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{14.0f,0.0f,0.0f} };
 
-	objectTransform_[7] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-2.0f,10.0f,0.0f} };
+	objectTransform_[7] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{16.0f,-6.0f,0.0f} };
 
-	objectTransform_[8] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[0].num[1],1.0f * ObjectSize[0].num[2]},{0.0f,0.0f,0.0f},{-1.0f,7.0f,0.0f} };
+	objectTransform_[8] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{18.0f,1.0f,0.0f} };
 
-	objectTransform_[9] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{3.0f,9.0f,0.0f} };
+	objectTransform_[9] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{20.0f,-5.0f,0.0f} };
 
-	objectTransform_[10] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-7.0f,8.0f,0.0f} };
+	objectTransform_[10] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{22.0f,-3.0f,0.0f} };
 
-	objectTransform_[11] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-8.0f,-1.5f,0.0f} };
+	objectTransform_[11] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{25.0f,0.0f,0.0f} };
 
-	objectTransform_[12] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-7.5f,4.5f,0.0f} };
+	objectTransform_[12] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{27.0f,-6.0f,0.0f} };
 
-	objectTransform_[13] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-6.0f,1.5f,0.0f} };
+	objectTransform_[13] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{29.0f,1.0f,0.0f} };
 
-	objectTransform_[14] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-10.0f,6.5f,0.0f} };
+	objectTransform_[14] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{30.0f,-7.0f,0.0f} };
 
-	objectTransform_[15] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-12.0f,7.5f,0.0f} };
+	objectTransform_[15] = { {1.0f * ObjectSize[1].num[0],1.0f * ObjectSize[1].num[1],1.0f * ObjectSize[1].num[2]},{0.0f,0.0f,0.0f},{32.0f,-4.0f,0.0f} };
 
-	objectTransform_[16] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-4.0f,0.5f,0.0f} };
-
-	objectTransform_[17] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-9.0f,10.5f,0.0f} };
-
-	objectTransform_[18] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{0.0f,13.5f,0.0f} };
-
-	objectTransform_[19] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{5.0f,5.5f,0.0f} };
-
-	objectTransform_[20] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-7.0f,15.5f,0.0f} };
-
-	objectTransform_[21] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-5.0f,11.0f,0.0f} };
-
-	objectTransform_[22] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{1.0f,12.0f,0.0f} };
-
-	objectTransform_[23] = { {1.0f * ObjectSize[2].num[0],1.0f * ObjectSize[2].num[1],1.0f * ObjectSize[2].num[2]},{0.0f,0.0f,0.0f},{-3.0f,17.0f,0.0f} };*/
 
 	playerTransform_ = { {1.0f * PlayerSize.num[0],1.0f * PlayerSize.num[1],1.0f * PlayerSize.num[2]},{0.0f,0.0f,0.0f},{-5.0f,-2.8f,0.0f} };
 	playerMaterial_ = { 1.0f,1.0f,1.0f,1.0f };
 
-	goalTransform_ = { {1.0f * goalSize.num[0],1.0f * goalSize.num[1],1.0f * goalSize.num[2]},{0.0f,0.0f,0.0f},{0.0f,20.0f,0.0f} };
+	goalTransform_ = { {1.0f * goalSize.num[0],1.0f * goalSize.num[1],1.0f * goalSize.num[2]},{0.0f,0.0f,0.0f},{33.0f,0.0f,0.0f} };
 	goalMaterial_ = { 1.0f,1.0f,1.0f,1.0f };
 
 	objectDraw_ = true;
@@ -131,7 +117,7 @@ void GameScene::Update() {
 	cameraTransform_.translate.num[1] = playerTransform_.translate.num[1] + 4.8f + playerTransform_.translate.num[1] / 65.0f;
 	cameraTransform_.rotate.num[0] = 0.2f;
 
-	for (int i = 0; i < kMaxObject; i++) {
+	for (int i = 0; i < 16; i++) {
 		aabb1 = AABBadd(playerTransform_.translate, PlayerSize);
 		aabb2 = AABBadd(objectTransform_[i].translate, ObjectSize[i]);
 		aabb3 = AABBadd(goalTransform_.translate, goalSize);
@@ -163,12 +149,12 @@ void GameScene::Update() {
 void GameScene::Draw()
 {
 
-	player_->Draw(playerMaterial_, playerTransform_, 0, cameraTransform_, directionalLight_);
+	player_->Draw(playerMaterial_, playerTransform_, 6, cameraTransform_, directionalLight_);
 
-	goal_->Draw(goalMaterial_, goalTransform_, 5, cameraTransform_, directionalLight_);
+	goal_->Draw(goalMaterial_, goalTransform_, 7, cameraTransform_, directionalLight_);
 
-	for (int i = 0; i < kMaxObject; i++) {
-		object_[i]->Draw(objectMaterial_[i], objectTransform_[i], 1, cameraTransform_, directionalLight_);
+	for (int i = 0; i < 16; i++) {
+		object_[i]->Draw(objectMaterial_[i], objectTransform_[i], 3, cameraTransform_, directionalLight_);
 	}
 
 }

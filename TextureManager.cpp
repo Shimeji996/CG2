@@ -1,25 +1,25 @@
-#include "TextureManager.h"
+ï»¿#include "TextureManager.h"
 
 void TextureManager::Initialize(MyEngine* engine) {
 	engine_ = engine;
 
-	//ƒvƒŒƒCƒ„[‚ÆƒS[ƒ‹‚ÌƒeƒNƒXƒ`ƒƒ
-	engine_->SettingTexture("resources/player.png", 0);
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
+	engine_->SettingTexture("resources/player.png", 6);
 
-	//ƒXƒe[ƒW‚ÌƒŠƒ\[ƒX
-	engine_->SettingTexture("resources/cube.jpg", 1);
+	//ã‚¹ãƒ†ãƒ¼ã‚¸ã®ãƒªã‚½ãƒ¼ã‚¹
+	engine_->SettingTexture("resources/cube.jpg", 3);
 
-	//ƒ^ƒCƒgƒ‹‚Ì‰æ‘œ
+	//ã‚¿ã‚¤ãƒˆãƒ«ã®ç”»åƒ
 	engine_->SettingTexture("resources/title.png", 2);
 
-	//ƒNƒŠƒA‰æ–Ê
-	engine_->SettingTexture("resources/clear.png", 3);
+	//ã‚¯ãƒªã‚¢ç”»é¢
+	engine_->SettingTexture("resources/clear.png", 5);
 
-	//ƒQ[ƒ€ƒI[ƒo[
+	//ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼
 	engine_->SettingTexture("resources/over.png", 4);
 
-	//ƒS[ƒ‹‚ÌƒeƒNƒXƒ`ƒƒ
-	engine_->SettingTexture("resources/uvChecker.png", 5);
+	//ã‚´ãƒ¼ãƒ«ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£
+	engine_->SettingTexture("resources/goal.png", 7);
 }
 
 void TextureManager::Finalize() {

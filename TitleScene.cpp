@@ -37,7 +37,7 @@ void TitleScene::Update() {
 		time = 0;
 	}
 
-	if (input_->PushKey(DIK_RETURN)) {
+	if (input_->PushKey(DIK_SPACE)) {
 		sceneNo = PLAY;
 	}
 }

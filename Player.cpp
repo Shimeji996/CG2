@@ -13,7 +13,7 @@ void Player::Initialize(MyEngine* engine, DirectXCommon* dxCommon) {
 
 	material = { 1.0f,1.0f,1.0f,1.0f };
 
-	object_->Initialize(dxCommon_, engine_, "resources/", "plane.obj");
+	object_->Initialize(dxCommon_, engine_, "resources/", "player.obj");
 
 	player = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 

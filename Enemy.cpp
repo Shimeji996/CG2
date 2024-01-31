@@ -12,7 +12,7 @@ void Enemy::Initialize(MyEngine* engine, DirectXCommon* dxCommon) {
 
 	material = { 1.0f,1.0f,1.0f,1.0f };
 
-	object_->Initialize(dxCommon_, engine_, "resources/", "plane.obj");
+	object_->Initialize(dxCommon_, engine_, "resources/", "player.obj");
 
 	std::mt19937 randomEngine(seedGenerator());
 	std::uniform_real_distribution<float> enemyTranslateX(-11.8f, 11.8f);

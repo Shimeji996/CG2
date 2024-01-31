@@ -9,7 +9,7 @@ void EnemyBullet::Initialize(MyEngine* engine, DirectXCommon* dxCommon) {
 	engine_ = engine;
 
 	object_ = new Object();
-	object_->Initialize(dxCommon_, engine_, "resources/", "plane.obj");
+	object_->Initialize(dxCommon_, engine_, "resources/", "player.obj");
 
 	material = { 1.0f,1.0f,1.0f,1.0f };
 

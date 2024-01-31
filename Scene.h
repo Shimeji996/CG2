@@ -15,6 +15,10 @@ protected:
 	//シーン番号を管理する変数
 	static int sceneNo;
 
+	static int scoar;
+
+	static int boxScoar;
+
 public:
 	//継承先で実装される関数
 	//抽象クラスなので純粋仮想関数

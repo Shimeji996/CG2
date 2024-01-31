@@ -4,6 +4,9 @@ SceneManager::SceneManager(MyEngine* engine, DirectXCommon* dxCommon) {
 	engine_ = engine;
 	dxCommon_ = dxCommon;
 
+	input_ = Input::GetInstance();
+	input_->Initialize();
+
 	//各シーンの配列
 	sceneArr_[TITLE] = std::make_unique<TitleScene>();
 	sceneArr_[PLAY] = std::make_unique<GameScene>();
@@ -32,6 +35,8 @@ int SceneManager::Run() {
 
 		engine_->BeginFrame();
 
+		input_->Update();
+
 		//シーンのチェック
 		prevSceneNo_ = currentSceneNo_;
 		currentSceneNo_ = sceneArr_[currentSceneNo_]->GetSceneNo();
@@ -49,6 +54,10 @@ int SceneManager::Run() {
 		sceneArr_[currentSceneNo_]->Draw();
 
 		engine_->EndFrame();
+
+		if (input_->PushKey(DIK_ESCAPE)) {
+			break;
+		}
 	}
 
 	sceneArr_[currentSceneNo_]->Finalize();

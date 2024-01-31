@@ -15,7 +15,7 @@ void Particle::Initialize(DirectXCommon* dxCommon, MyEngine* engine, const std::
 	TransformMatrix();
 }
 
-void Particle::Draw(ParticleData* transforms, uint32_t index, const Transform& cameraTransform)
+void Particle::Draw(ParticleData* transforms, uint32_t index, Transform cameraTransform)
 {
 
 	//Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
@@ -170,7 +170,7 @@ ParticleData Particle::MakeNewParticle(std::mt19937& randomEngine) {
 	return particle;
 }
 
-ParticleData Particle::MakeNewParticleSetPos(std::mt19937& randomEngine, Transform& transform) {
+ParticleData Particle::MakeNewParticleSetPos(std::mt19937& randomEngine, Transform transform) {
 	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
 	std::uniform_real_distribution<float> distColor(0.0f, 1.0f);
 	ParticleData particle;

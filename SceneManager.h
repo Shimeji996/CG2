@@ -5,6 +5,7 @@
 #include "GameScene.h"
 #include "ClearScene.h"
 #include "OverScene.h"
+#include "Input.h"
 
 class SceneManager
 {
@@ -19,6 +20,8 @@ private:
 	MyEngine* engine_;
 	DirectXCommon* dxCommon_;
 	Scene* baseScene;
+
+	Input* input_;
 public:
 	SceneManager(MyEngine* engine, DirectXCommon* dxCommon);
 	~SceneManager();

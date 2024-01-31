@@ -1,9 +1,10 @@
 #pragma once
-
 #include "Scene.h"
 #include "Input.h"
 #include "Matrix.h"
 #include "Quaternion.h"
+#include "Sprite.h"
+#include "TextureManager.h"
 
 class TitleScene : public Scene
 {
@@ -21,6 +22,15 @@ private:
 	MyEngine* engine_;
 	DirectXCommon* dxCommon_;
 	Input* input_;
+
+	Sprite* sprite_;
+
+	SpriteData spriteData_;
+	Transform spriteTransform_;
+
+	TextureManager* textureManager_;
+
+	DirectionalLight directionalLight_;
 
 	int time;
 

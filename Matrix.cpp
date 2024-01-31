@@ -184,6 +184,15 @@ Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2)
 	return result;
 }
 
+//加法式
+Vector3 Add(const Vector3& v1, const Vector3& v2) {
+	Vector3 result{};
+	result.num[0] = v1.num[0] + v2.num[0];
+	result.num[1] = v1.num[1] + v2.num[1];
+	result.num[2] = v1.num[2] + v2.num[2];
+	return result;
+}
+
 //行列の減法
 Matrix4x4 Sub(const Matrix4x4& m1, const Matrix4x4& m2)
 {
@@ -543,5 +552,13 @@ Vector3 VectorTransform(const Vector3& vector, const Matrix4x4& matrix)
 	result.num[0] /= w;
 	result.num[1] /= w;
 	result.num[2] /= w;
+	return result;
+}
+
+Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
+	Vector3 result{
+		v.num[0] * m.m[0][0] + v.num[1] * m.m[1][0] + v.num[2] * m.m[2][0],
+		v.num[0] * m.m[0][1] + v.num[1] * m.m[1][1] + v.num[2] * m.m[2][1],
+		v.num[0] * m.m[0][2] + v.num[1] * m.m[1][2] + v.num[2] * m.m[2][2] };
 	return result;
 }

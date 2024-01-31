@@ -13,9 +13,57 @@
 #include "Particle.h"
 #include "Scene.h"
 #include <random>
+#include "Player.h"
+#include "TextureManager.h"
+#include "SkyDome.h"
+#include "Enemy.h"
+#include "EnemyBullet.h"
+
+struct AABB {
+	Vector3 min;
+	Vector3 max;
+};
+
 
 class GameScene : public Scene
 {
+private:
+	Player* player_;
+	SkyDome* skydome_;
+	std::list<Enemy*> enemy_;
+	std::list<EnemyBullet*> enemyBullets_;
+	std::list<PlayerBullet*> bullets_;
+	Transform enemyTransform_;
+
+	int enemySpornTimer = 0;
+	int enemyCount = 0;
+
+	int count = 0;
+	bool isShot = false;
+
+	bool particleSporn = false;
+	int particleCount = 0;
+
+	int sceneChangeTimer = 3600;
+	int boxTimer = 3600;
+
+	int eachTimer[2];
+
+	bool isEnemyAttack = true;
+	int enemyCoolDown = 0;
+
+private:
+
+	void EnemySporn();
+
+	bool IsCollision(const AABB& aabb1, const AABB& aabb2);
+
+	void PlayerAttack();
+
+	void EnemyAttack();
+
+	AABB AABBadd(Vector3 a, Vector3 objectSize);
+
 public:
 	void Initialize(MyEngine* engine, DirectXCommon* dxCommon) override;
 
@@ -26,8 +74,21 @@ public:
 	void Finalize() override;
 
 private:
+
+	AABB aabb1{
+
+		.min{1.0f,1.0f,-1.0f},
+		.max{-1.0f,-1.0f,1.0f},
+	};
+
+	AABB aabb2{
+		.min{1.0f,1.0f,-1.0f},
+		.max{-1.0f,-1.0f,1.0f},
+	};
+
 	MyEngine* engine_;
 	DirectXCommon* dxCommon_;
+	TextureManager* textureManager_;
 
 	Triangle* triangle_[2];
 	TriangleData triangleData_[2];
@@ -36,7 +97,7 @@ private:
 
 	Sprite* sprite_[2];
 	SpriteData spriteData_;
-	Transform spriteTransform_;
+	Transform spriteTransform_[2];
 
 	Sphere* sphere_;
 	Transform sphereTransform_;
@@ -63,7 +124,7 @@ private:
 	Particle* particle;
 	ParticleData particles[10];
 
-	std::random_device seedGenerator;
+	std::random_device generator;
 
 	const float kDeltaTime = 1.0f / 60.0f;
 

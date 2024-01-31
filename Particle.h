@@ -28,7 +28,7 @@ class Particle
 public:
 	void Initialize(DirectXCommon* dxCommon, MyEngine* engine, const std::string& directoryPath, const std::string& filename);
 
-	void Draw(ParticleData* transforms, uint32_t index, const Transform& cameraTransform);
+	void Draw(ParticleData* transforms, uint32_t index, Transform cameraTransform);
 
 	void Finalize();
 
@@ -36,7 +36,7 @@ public:
 
 	ParticleData MakeNewParticle(std::mt19937& randomEngine);
 
-	ParticleData MakeNewParticleSetPos(std::mt19937& randomEngine, Transform& transform);
+	ParticleData MakeNewParticleSetPos(std::mt19937& randomEngine, Transform transform);
 
 	Transform uvTransformSprite{
 		{1.0f,1.0f,1.0f},

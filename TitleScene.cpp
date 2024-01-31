@@ -6,40 +6,58 @@ void TitleScene::Initialize(MyEngine* engine, DirectXCommon* dxCommon) {
 	input_ = Input::GetInstance();
 	input_->Initialize();
 
-	rotation = MakeRotateAxisAngleQuaternion(Normalise(Vector3{ 1.0f,0.4f,-0.2f }), 0.45f);
-	Vector3 pointY = { 2.1f,-0.9f,1.3f };
-	rotateMatrix = MakeRotateMatrix(rotation);
-	rotateByQuaternion = RotateVector(pointY, rotation);
-	rotateByMatrix = VectorTransform(pointY, rotateMatrix);
+	textureManager_ = new TextureManager();
+	textureManager_->Initialize(engine_);
+
+	directionalLight_.color = { 1.0f,1.0f,1.0f,1.0f };
+	directionalLight_.direction = { 0.0f,-1.0f,0.0f };
+	directionalLight_.intensity = 1.0f;
+
+	spriteData_.LeftTop[0] = { 0.0f,0.0f,0.0f,1.0f };
+	spriteData_.RightDown[0] = { 1280.0f,720.0f,0.0f,1.0f };
+	spriteData_.LeftTop[1] = { 0.0f,0.0f,0.0f,1.0f };
+	spriteData_.RightDown[1] = { 1280.0f,720.0f,0.0f,1.0f };
+	spriteData_.material = { 1.0f,1.0f,1.0f,1.0f };
+
+	spriteTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+
+	sprite_ = new Sprite();
+	sprite_->Initialize(dxCommon_, engine_);
+
+	time = 0;
 
 }
 
 void TitleScene::Update() {
 	input_->Update();
 
-	ImGui::Begin("MT4_01_04");
-	ImGui::Text("rotation");
-	ImGui::Text("%4.2f %4.2f %4.2f %4.2f", rotation.x, rotation.y, rotation.z, rotation.w);
-	ImGui::Text("rotateMatrix");
-	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix.m[0][0], rotateMatrix.m[0][1], rotateMatrix.m[0][2], rotateMatrix.m[0][3]);
-	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix.m[1][0], rotateMatrix.m[1][1], rotateMatrix.m[1][2], rotateMatrix.m[1][3]);
-	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix.m[2][0], rotateMatrix.m[2][1], rotateMatrix.m[2][2], rotateMatrix.m[2][3]);
-	ImGui::Text("%4.3f %4.3f %4.3f %4.3f", rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3][2], rotateMatrix.m[3][3]);
-	ImGui::Text("rotateByQuaternion");
-	ImGui::Text("%4.2f %4.2f %4.2f", rotateByQuaternion.num[0], rotateByQuaternion.num[1], rotateByQuaternion.num[2]);
-	ImGui::Text("rotateByMatrix");
-	ImGui::Text("%4.2f %4.2f %4.2f", rotateByMatrix.num[0], rotateByMatrix.num[1], rotateByMatrix.num[2]);
-	ImGui::End();
+	time++;
 
-	if (input_->TriggerKey(DIK_SPACE)) {
+	if (time >= 90) {
+		time = 0;
+	}
+
+	if (input_->PushKey(DIK_RETURN)) {
 		sceneNo = PLAY;
 	}
 }
 
 void TitleScene::Draw() {
-
+	if (time <= 0 || time <= 45) {
+		for (int i = 0; i < 1; i++)
+		{
+			sprite_->Draw(spriteData_.LeftTop[i], spriteData_.RightDown[i], spriteTransform_, spriteData_.material, 16, directionalLight_);
+		}
+	}
+	else if (time >= 45) {
+		for (int i = 0; i < 1; i++)
+		{
+			sprite_->Draw(spriteData_.LeftTop[i], spriteData_.RightDown[i], spriteTransform_, spriteData_.material, 17, directionalLight_);
+		}
+	}
 }
 
 void TitleScene::Finalize() {
-
+	delete sprite_;
+	delete textureManager_;
 }

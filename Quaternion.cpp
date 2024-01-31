@@ -3,7 +3,7 @@
 Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs)
 {
 	Quaternion result;
-	Vector3 cross = Cross({ lhs.x,lhs.y,lhs.z }, { rhs.x,rhs.y,rhs.z });
+	Vector3 cross = Cross({ lhs.x,lhs.y,lhs.z}, {rhs.x,rhs.y,rhs.z});
 	float dot = Dot({ lhs.x,lhs.y,lhs.z }, { rhs.x,rhs.y,rhs.z });
 	result.x = cross.num[0] + rhs.w * lhs.x + lhs.w * rhs.x;
 	result.y = cross.num[1] + rhs.w * lhs.y + lhs.w * rhs.y;

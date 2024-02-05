@@ -1,14 +1,14 @@
 ﻿#pragma once
 #include "DirectX.h"
 #include <dxcapi.h>
-#include "String.h"
+#include "../String.h"
 #include "Matrix.h"
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
-#include "Vertex.h"
+#include "../Vertex.h"
 #include "Triangle.h"
-#include "externals/DirectXTex/d3dx12.h"
+#include "DirectXTex/d3dx12.h"
 #include <vector>
 #pragma comment(lib,"dxcompiler.lib")
 

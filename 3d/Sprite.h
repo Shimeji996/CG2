@@ -3,7 +3,7 @@
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
-#include "Vertex.h"
+#include "../Vertex.h"
 #include "Engine.h"
 
 class Sprite

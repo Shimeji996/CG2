@@ -126,6 +126,23 @@ void GameScene::Update()
 	if (input_->PushKey(DIK_RETURN)) {
 		sphereTransform_.rotate.num[1] += 0.01f;
 	}
+
+	if (input_->PushKey(DIK_W) || input_->PushKey(DIK_UP)) {
+		sphereTransform_.translate.num[1] += 0.01f;
+	}
+
+	if (input_->PushKey(DIK_S) || input_->PushKey(DIK_DOWN)) {
+		sphereTransform_.translate.num[1] -= 0.01f;
+	}
+
+	if (input_->PushKey(DIK_A) || input_->PushKey(DIK_LEFT)) {
+		sphereTransform_.translate.num[0] -= 0.01f;
+	}
+
+	if (input_->PushKey(DIK_D) || input_->PushKey(DIK_RIGHT)) {
+		sphereTransform_.translate.num[0] += 0.01f;
+	}
+		
 	sphereMatrix_ = MakeAffineMatrix(sphereTransform_.scale, sphereTransform_.rotate, sphereTransform_.translate);
 
 	Matrix4x4 sphereAffine = MakeAffineMatrix(sphereTransform_.scale, sphereTransform_.rotate, sphereTransform_.translate);

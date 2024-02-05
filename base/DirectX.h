@@ -3,9 +3,9 @@
 #include <cstdlib>
 #include <dxgi1_6.h>
 #include "WinApp.h"
-#include "String.h"
+#include "../String.h"
 #include <wrl.h>
-#include "externals/DirectXTex/DirectXTex.h"
+#include "DirectXTex/DirectXTex.h"
 
 struct D3DResourceLeakChecker
 {

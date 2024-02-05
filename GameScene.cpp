@@ -104,7 +104,7 @@ void GameScene::Update()
 				scoar += 100;
 				boxScoar += 100;
 
-				particle->Initialize(dxCommon_, engine_, "Resource/", "plane.obj");
+				particle->Initialize(dxCommon_, engine_, "resources/", "plane.obj");
 
 				std::mt19937 random(generator());
 

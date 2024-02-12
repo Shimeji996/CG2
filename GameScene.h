@@ -52,6 +52,8 @@ private:
 	bool isEnemyAttack = true;
 	int enemyCoolDown = 0;
 
+	bool isChange;
+
 private:
 
 	void EnemySporn();
@@ -95,8 +97,8 @@ private:
 	Transform transform_[2];
 	Matrix4x4 worldMatrix_;
 
-	Sprite* sprite_[2];
-	SpriteData spriteData_;
+	Sprite* sprite_[3];
+	SpriteData spriteData_[2];
 	Transform spriteTransform_[2];
 
 	Sphere* sphere_;

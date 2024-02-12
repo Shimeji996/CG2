@@ -94,7 +94,7 @@ void ClearScene::Draw() {
 		}
 	}
 
-	for (int s = 0; s < 10; s++) {
+	/*for (int s = 0; s < 10; s++) {
 		if (eachScoar[1] == s && eachScoar[1] != 0) {
 			for (int i = 0; i < 1; i++)
 			{
@@ -125,7 +125,7 @@ void ClearScene::Draw() {
 				sprite_[4]->Draw(spriteData_[0].LeftTop[i], spriteData_[0].RightDown[i], spriteTransform_[4], spriteData_[0].material, s + 6, directionalLight_);
 			}
 		}
-	}
+	}*/
 
 }
 

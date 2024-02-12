@@ -26,16 +26,22 @@ void GameScene::Initialize(MyEngine* engine, DirectXCommon* dxCommon)
 	particle = new Particle();
 	particle->Initialize(dxCommon_, engine_, "resources/", "plane.obj");
 
-	spriteData_.LeftTop[0] = { 0.0f,0.0f,0.0f,1.0f };
-	spriteData_.RightDown[0] = { 60.0f,60.0f,0.0f,1.0f };
-	spriteData_.LeftTop[1] = { 0.0f,0.0f,0.0f,1.0f };
-	spriteData_.RightDown[1] = { 60.0f,60.0f,0.0f,1.0f };
-	spriteData_.material = { 1.0f,1.0f,1.0f,1.0f };
+	spriteData_[0].LeftTop[0] = { 0.0f,0.0f,0.0f,1.0f };
+	spriteData_[0].RightDown[0] = { 60.0f,60.0f,0.0f,1.0f };
+	spriteData_[0].LeftTop[1] = { 0.0f,0.0f,0.0f,1.0f };
+	spriteData_[0].RightDown[1] = { 60.0f,60.0f,0.0f,1.0f };
+	spriteData_[0].material = { 1.0f,1.0f,1.0f,1.0f };
+
+	spriteData_[1].LeftTop[0] = { 0.0f,0.0f,0.0f,1.0f };
+	spriteData_[1].RightDown[0] = { 1280.0f,720.0f,0.0f,1.0f };
+	spriteData_[1].LeftTop[1] = { 0.0f,0.0f,0.0f,1.0f };
+	spriteData_[1].RightDown[1] = { 1280.0f,720.0f,0.0f,1.0f };
+	spriteData_[1].material = { 1.0f,1.0f,1.0f,1.0f };
 
 	spriteTransform_[0] = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 	spriteTransform_[1] = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{30.0f,0.0f,0.0f} };
 
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 3; i++) {
 		sprite_[i] = new Sprite();
 		sprite_[i]->Initialize(dxCommon_, engine_);
 	}
@@ -57,6 +63,7 @@ void GameScene::Initialize(MyEngine* engine, DirectXCommon* dxCommon)
 	isEnemyAttack = true;
 	enemyCoolDown = 0;
 
+	isChange = true;
 }
 
 void GameScene::Update()
@@ -66,9 +73,20 @@ void GameScene::Update()
 	player_->Update();
 	skydome_->Update();
 
-	PlayerAttack();
-	EnemyAttack();
-	EnemySporn();
+	if (isChange == true) {
+		spriteData_[1].material.num[3] -= 0.01f;
+	}
+
+	if (spriteData_[1].material.num[3] <= 0.0f) {
+		isChange = false;
+	}
+
+	if (isChange == false) {
+		sceneChangeTimer--;
+		PlayerAttack();
+		EnemyAttack();
+		EnemySporn();
+	}
 
 	bullets_.remove_if([](PlayerBullet* bullet) {
 		if (bullet->IsDead()) {
@@ -127,8 +145,6 @@ void GameScene::Update()
 		enemy->Update();
 	}
 
-	sceneChangeTimer--;
-
 	eachTimer[1] = sceneChangeTimer / 100;
 	boxTimer = boxTimer % 1;
 
@@ -178,22 +194,31 @@ void GameScene::Draw()
 		enemy->Draw(cameraTransform_, directionalLight_);
 	}
 
-	/*for (int s = 0; s < 10; s++) {
-		if (eachTimer[0] == s) {
-			for (int i = 0; i < 1; i++)
-			{
-				sprite_[0]->Draw(spriteData_.LeftTop[i], spriteData_.RightDown[i], spriteTransform_[0], spriteData_.material, s + 6, directionalLight_);
+	if (isChange == false) {
+		/*for (int s = 0; s < 10; s++) {
+			if (eachTimer[0] == s) {
+				for (int i = 0; i < 1; i++)
+				{
+					sprite_[0]->Draw(spriteData_[0].LeftTop[i], spriteData_[0].RightDown[i], spriteTransform_[0], spriteData_[0].material, s + 6, directionalLight_);
+				}
 			}
-		}
-		if (eachTimer[1] == s) {
-			for (int i = 0; i < 1; i++)
-			{
-				sprite_[1]->Draw(spriteData_.LeftTop[i], spriteData_.RightDown[i], spriteTransform_[1], spriteData_.material, s + 6, directionalLight_);
+			if (eachTimer[1] == s) {
+				for (int i = 0; i < 1; i++)
+				{
+					sprite_[1]->Draw(spriteData_[0].LeftTop[i], spriteData_[0].RightDown[i], spriteTransform_[1], spriteData_[0].material, s + 6, directionalLight_);
+				}
 			}
-		}
-	}*/
+		}*/
+	}
 
 	particle->Draw(&particles[0], 4, cameraTransform_);
+
+	if (isChange == true) {
+		for (int i = 0; i < 1; i++)
+		{
+			sprite_[2]->Draw(spriteData_[1].LeftTop[i], spriteData_[1].RightDown[i], spriteTransform_[0], spriteData_[1].material, 2, directionalLight_);
+		}
+	}
 
 }
 
@@ -285,8 +310,8 @@ bool GameScene::IsCollision(const AABB& aabb1, const AABB& aabb2) {
 AABB GameScene::AABBadd(Vector3 a, Vector3 objectSize) {
 	AABB aabb{};
 	for (int i = 0; i < 100; i++) {
-		aabb.min = { 1.0f * objectSize.num[0],1.0f * objectSize.num[1],-1.0f * objectSize.num[2]};
-		aabb.max = { -1.0f * objectSize.num[0],-1.0f * objectSize.num[1],1.0f * objectSize.num[2]};
+		aabb.min = { 1.0f * objectSize.num[0],1.0f * objectSize.num[1],-1.0f * objectSize.num[2] };
+		aabb.max = { -1.0f * objectSize.num[0],-1.0f * objectSize.num[1],1.0f * objectSize.num[2] };
 
 		aabb.min.num[0] += a.num[0];
 		aabb.min.num[1] += a.num[1];
@@ -314,7 +339,7 @@ void GameScene::Finalize()
 	for (EnemyBullet* bullet : enemyBullets_) {
 		delete bullet;
 	}
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 3; i++) {
 		delete sprite_[i];
 	}
 	delete particle;

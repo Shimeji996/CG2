@@ -25,7 +25,7 @@ private:
 
 	Sprite* sprite_;
 
-	SpriteData spriteData_;
+	SpriteData spriteData_[2];
 	Transform spriteTransform_;
 
 	TextureManager* textureManager_;
@@ -33,6 +33,8 @@ private:
 	DirectionalLight directionalLight_;
 
 	int time;
+
+	bool isDraw;
 
 	Vector3 from0;
 	Vector3 to0;

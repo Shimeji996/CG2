@@ -35,6 +35,8 @@ void Enemy::Update() {
 		material.num[3] -= 0.005f;
 	}
 
+	enemy.rotate.num[1] += 0.05f;
+
 	if (material.num[3] <= 0.000f) {
 		isDead_ = true;
 	}

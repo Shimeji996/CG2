@@ -17,7 +17,9 @@ void TitleScene::Initialize(MyEngine* engine, DirectXCommon* dxCommon) {
 void TitleScene::Update() {
 	input_->Update();
 
-	ImGui::Begin("MT4_01_04");
+	ImGui::Text("PRESS SPACE");
+
+	/*ImGui::Begin("MT4_01_04");
 	ImGui::Text("rotation");
 	ImGui::Text("%4.2f %4.2f %4.2f %4.2f", rotation.x, rotation.y, rotation.z, rotation.w);
 	ImGui::Text("rotateMatrix");
@@ -29,7 +31,7 @@ void TitleScene::Update() {
 	ImGui::Text("%4.2f %4.2f %4.2f", rotateByQuaternion.num[0], rotateByQuaternion.num[1], rotateByQuaternion.num[2]);
 	ImGui::Text("rotateByMatrix");
 	ImGui::Text("%4.2f %4.2f %4.2f", rotateByMatrix.num[0], rotateByMatrix.num[1], rotateByMatrix.num[2]);
-	ImGui::End();
+	ImGui::End();*/
 
 	if (input_->TriggerKey(DIK_SPACE)) {
 		sceneNo = PLAY;

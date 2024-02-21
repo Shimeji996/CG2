@@ -10,6 +10,7 @@ void Triangle::Initialize(DirectXCommon* dxCommon, MyEngine* engine)
 	SettingColor();
 	SettingDictionalLight();
 	TransformMatrix();
+	CameraResource();
 }
 
 void Triangle::Draw(const Vector4& a, const Vector4& b, const Vector4& c, const Vector4& material, const Transform& transform, const Transform& cameraTransform, uint32_t index, const DirectionalLight& light)
@@ -42,6 +43,8 @@ void Triangle::Draw(const Vector4& a, const Vector4& b, const Vector4& c, const 
 	*wvpData_ = { wvpMatrix_,worldMatrix };
 	*directionalLight_ = light;
 
+	*cameraData_ = cameraTransform.translate;
+
 	//RootSignatureを設定。PS0とは別途設定が必要
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(engine_->GetRootSignature().Get());
 
@@ -58,6 +61,7 @@ void Triangle::Draw(const Vector4& a, const Vector4& b, const Vector4& c, const 
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, cameraResource_->GetGPUVirtualAddress());
 
 	//SRVのDescriptorTableの先頭を設定。2はrootParameter[2]のこと
 	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, engine_->textureSrvHandleGPU_[index]);
@@ -113,4 +117,10 @@ void Triangle::SettingDictionalLight()
 {
 	directionalLightResource_ = DirectXCommon::CreateBufferResource(dxCommon_->GetDevice(), sizeof(DirectionalLight));
 	directionalLightResource_->Map(0, NULL, reinterpret_cast<void**>(&directionalLight_));
+}
+
+void Triangle::CameraResource() {
+	cameraResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(CameraForGPU));
+
+	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
 }

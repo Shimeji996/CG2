@@ -34,6 +34,8 @@ private:
 
 	void TransformMatrix();
 
+	void CameraResource();
+
 private:
 	MyEngine* engine_;
 
@@ -57,4 +59,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;
 
 	Matrix4x4 uvTransformMatrix;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
+	Vector3* cameraData_;
 };

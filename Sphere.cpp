@@ -12,6 +12,7 @@ void Sphere::Initialize(DirectXCommon* dxCommon, MyEngine* engine)
 	SettingColor();
 	SettingDictionalLight();
 	TransformMatrix();
+	CameraResource();
 }
 
 void Sphere::Draw(const Vector4& material, const Transform& transform, uint32_t index, const Transform& cameraTransform, const DirectionalLight& light)
@@ -26,6 +27,8 @@ void Sphere::Draw(const Vector4& material, const Transform& transform, uint32_t 
 	uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZmatrix(uvTransformSprite.rotate.num[2]));
 	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
+
+	*cameraData_ = cameraTransform.translate;
 
 	//経度分割一つ分の角度
 	const float kLonEvery = pi * 2.0f / float(kSubDivision);
@@ -89,6 +92,7 @@ void Sphere::Draw(const Vector4& material, const Transform& transform, uint32_t 
 	materialData_->uvTransform = uvTransformMatrix;
 	*wvpData_ = { wvpMatrix_,worldMatrix };
 	*directionalLight_ = light;
+	materialData_->shininess = 50.0f;
 
 	//RootSignatureを設定。PS0とは別途設定が必要
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(engine_->GetRootSignature().Get());
@@ -106,6 +110,7 @@ void Sphere::Draw(const Vector4& material, const Transform& transform, uint32_t 
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, cameraResource_->GetGPUVirtualAddress());
 
 	//SRVのDescriptorTableの先頭を設定。2はrootParameter[2]のこと
 	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, engine_->textureSrvHandleGPU_[index]);
@@ -160,4 +165,10 @@ void Sphere::SettingDictionalLight()
 {
 	directionalLightResource_ = DirectXCommon::CreateBufferResource(dxCommon_->GetDevice(), sizeof(DirectionalLight));
 	directionalLightResource_->Map(0, nullptr, reinterpret_cast<void**>(&directionalLight_));
+}
+
+void Sphere::CameraResource() {
+	cameraResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(CameraForGPU));
+
+	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
 }

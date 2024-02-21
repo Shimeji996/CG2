@@ -15,6 +15,7 @@ struct VertexData
 	Vector4 position;
 	Vector2 texcoord;
 	Vector3 normal;
+	Vector3 worldPosition;
 };
 
 struct TriangleData
@@ -42,6 +43,7 @@ struct Material
 	int32_t enableLighting;
 	float padding[3];
 	Matrix4x4 uvTransform;
+	float shininess;
 };
 
 struct DirectionalLight
@@ -64,4 +66,8 @@ struct ParticleForGPU {
 	Matrix4x4 WVP;
 	Matrix4x4 World;
 	Vector4 color;
+};
+
+struct CameraForGPU {
+	Vector3 worldPosition;
 };

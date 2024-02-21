@@ -101,6 +101,7 @@ void GameScene::Initialize(MyEngine* engine, DirectXCommon* dxCommon)
 	}
 
 	cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
+
 }
 
 void GameScene::Update()
@@ -114,12 +115,14 @@ void GameScene::Update()
 			return;
 		}*/
 		//if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
-		transform_[i].rotate.num[1] += 0.01f;
+		if (input_->PushKey(DIK_R)) {
+			transform_[i].rotate.num[1] += 0.01f;
+		}
 		//}
 		worldMatrix_ = MakeAffineMatrix(transform_[i].scale, transform_[i].rotate, transform_[i].translate);
 	}
 
-	if (input_->PushKey(DIK_A)) {
+	if (input_->PushKey(DIK_SPACE)) {
 		sound_->PlayWave(soundDataHandle_, true, 1.0f);
 	}
 
@@ -152,6 +155,7 @@ void GameScene::Update()
 	ImGui::Begin("OPTION");
 	if (ImGui::TreeNode("Triangle"))
 	{
+		ImGui::Text("Rotate Push [R]");
 		if (ImGui::Button("TriangleA"))
 		{
 			if (triangleDrawA_ == false)
@@ -200,6 +204,7 @@ void GameScene::Update()
 	}
 	if (ImGui::TreeNode("Sphere"))
 	{
+		ImGui::Text("Rotate Push [ENTER]");
 		if (ImGui::Button("Sphere"))
 		{
 			if (sphereDraw_ == false)
@@ -282,7 +287,7 @@ void GameScene::Update()
 		for (int i = 0; i < 2; i++) {
 			ImGui::DragFloat2("UVTranslate", &sprite_[i]->uvTransformSprite.translate.num[0], 0.01f, -10.0f, 10.0f);
 			ImGui::DragFloat2("UVScale", &sprite_[i]->uvTransformSprite.scale.num[0], 0.01f, -10.0f, 10.0f);
-			ImGui::SliderAngle("UVRotate", &sprite_[i]->uvTransformSprite.rotate.num[0]);
+			ImGui::SliderAngle("UVRotate", &sprite_[i]->uvTransformSprite.rotate.num[2]);
 		}
 		ImGui::TreePop();
 	}

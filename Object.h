@@ -32,6 +32,8 @@ private:
 
 	void TransformMatrix();
 
+	void CameraResource();
+
 private:
 	DirectXCommon* dxCommon_;
 	MyEngine* engine_;
@@ -53,4 +55,6 @@ private:
 
 	ModelData modelData;
 
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
+	Vector3* cameraData_;
 };

@@ -9,6 +9,7 @@ void Sprite::Initialize(DirectXCommon* dxCommon, MyEngine* engine)
 	SettingDictionalLight();
 	SettingIndex();
 	TransformMatrix();
+	CameraResource();
 }
 
 void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform, const Vector4& material, uint32_t index, const DirectionalLight& light) {
@@ -32,11 +33,11 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 
 	//座標の設定
 	vertexData_[0].position = { a.num[0],b.num[1],0.0f,1.0f};
-	vertexData_[1].position = { a.num[0],a.num[1],0.0f,1.0f};
-	vertexData_[2].position = { b.num[0],b.num[1],0.0f,1.0f};
-	vertexData_[3].position = { a.num[0],a.num[1],0.0f,1.0f};
-	vertexData_[4].position = { b.num[0],a.num[1],0.0f,1.0f};
-	vertexData_[5].position = { b.num[0],b.num[1],0.0f,1.0f};
+	vertexData_[1].position = { a.num[0],a.num[1],0.0f,1.0f };
+	vertexData_[2].position = { b.num[0],b.num[1],0.0f,1.0f };
+	vertexData_[3].position = { a.num[0],a.num[1],0.0f,1.0f };
+	vertexData_[4].position = { b.num[0],a.num[1],0.0f,1.0f };
+	vertexData_[5].position = { b.num[0],b.num[1],0.0f,1.0f };
 
 	//Texcoordの設定
 	vertexData_[0].texcoord = { 0.0f,1.0f };
@@ -59,6 +60,7 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 
 	*materialData_ = { material,false };
 	*directionalLight_ = light;
+	*cameraData_ = { 0.0f,0.0f,0.0f };
 
 	//Sprite用のworldViewProjectionMatrixを作る
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
@@ -87,6 +89,7 @@ void Sprite::Draw(const Vector4& a, const Vector4& b, const Transform& transform
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_->GetGPUVirtualAddress());
 	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, engine_->textureSrvHandleGPU_[index]);
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(5, cameraResource_->GetGPUVirtualAddress());
 
 	dxCommon_->GetCommandList()->DrawInstanced(6, 1, 0, 0);
 	dxCommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
@@ -157,4 +160,10 @@ void Sprite::SettingIndex() {
 
 	indexResourceSprite_->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
 
+}
+
+void Sprite::CameraResource() {
+	cameraResource_ = dxCommon_->CreateBufferResource(dxCommon_->GetDevice(), sizeof(CameraForGPU));
+
+	cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraData_));
 }

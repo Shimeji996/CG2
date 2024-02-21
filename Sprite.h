@@ -32,6 +32,8 @@ private:
 
 	void SettingColor();
 
+	void CameraResource();
+
 private:
 	DirectXCommon* dxCommon_;
 	MyEngine* engine_;
@@ -62,4 +64,6 @@ private:
 
 	bool IsusedSpriteIndex[kMaxSprite];
 
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
+	Vector3* cameraData_;
 };
